@@ -1,21 +1,26 @@
 package com.epms.backend.entity;
 
+import com.epms.backend.entity.enums.PackageCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "package")
+@Table(name = "packageData")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Package {
+public class PackageData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "package_id", nullable = false)
     private int packageId;
+
+    @Enumerated
+    @Column(name = "package_category", nullable = false)
+    private PackageCategory packageCategory;
 
     @Column(name = "package_name",length = 100, nullable = false)
     private String packageName;
@@ -25,8 +30,4 @@ public class Package {
 
     @Column(name = "package_price", nullable = false)
     private int packagePrice;
-
-    @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
 }

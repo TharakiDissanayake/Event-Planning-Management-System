@@ -28,7 +28,7 @@ public class Offer {
 
     @ManyToOne
     @JoinColumn(name = "package", nullable = false)
-    private Package aPackage;
+    private PackageData packageData;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)

@@ -1,0 +1,5 @@
+package com.epms.backend.entity.enums;
+
+public enum PackageCategory {
+    WEDDING, ENGAGEMENT_PARTY, BIRTHDAY_PARTY, ANNEVASARY_CELEBRATION, CORPARATE_MEETING, CONFERENCE_SEMINAR
+}
