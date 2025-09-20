@@ -1,6 +1,8 @@
 import EventCard from "./components/EventCard";
 import Sidebar from "./components/SideBar";
 import eventimg from "./assets/images/event-image.jpg";
+import PackageCard from "./components/PackageCard";
+import packageimg from "./assets/images/package-image.png";
 import { useEffect, useState } from "react";
 
 function App() {
@@ -22,6 +24,14 @@ function App() {
         description="Full service with catering, music, and decorations." 
         date={"2024-12-31"}
         onClick={() => {}}/>
+      <PackageCard
+        image={packageimg}
+        title="Package Title"
+        description="A comprehensive package including venue, catering, and entertainment."
+        startDate={"2024-12-01"}
+        endDate={"2024-12-31"}
+        onClick={() => {}}
+      />
     </div>
   )
 }
