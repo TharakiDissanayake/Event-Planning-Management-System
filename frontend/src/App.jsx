@@ -1,4 +1,3 @@
-import { Outlet } from "react-router-dom";
 import Sidebar from "./components/SideBar";
 import { useEffect, useState } from "react";
 
@@ -15,9 +14,6 @@ function App() {
   return (
     <div className="flex">
       <Sidebar role={role}/>
-      {/* <main>
-        <Outlet/>
-      </main> */}
     </div>
   )
 }
