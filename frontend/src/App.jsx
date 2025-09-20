@@ -2,18 +2,18 @@ import Sidebar from "./components/SideBar";
 import { useEffect, useState } from "react";
 
 function App() {
-  const [role, setRole] = useState(null);
+  // const [role, setRole] = useState(null);
 
-  useEffect(() => {
-    const storedRole = localStorage.getItem("userRole");
-    setRole(storedRole); // "admin" or "staff"
-  }, []);
+  // useEffect(() => {
+  //   const storedRole = localStorage.getItem("userRole");
+  //   setRole(storedRole); // "admin" or "staff"
+  // }, []);
 
-  if (!role) return null; // or a loading spinner
+  // if (!role) return null; // or a loading spinner
 
   return (
     <div className="flex">
-      <Sidebar role={role}/>
+      <Sidebar role="staff"/>
     </div>
   )
 }

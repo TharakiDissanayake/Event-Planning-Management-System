@@ -8,8 +8,10 @@ function Sidebar({ role }) {
     { to: "/add-customer", label: "Add Customer" },
     { to: "/add-event", label: "Add Event" },
     { to: "/check-customer", label: "Check Customer" },
-    { to: "/add-packages", label: "Add Packages", roles: ["admin"]}, // Only for admin
-    { to: "/add-offers", label: "Add Offers", roles: ["admin"]}, // Only for admin
+    { to: "/view-packages", label: "View Packages"},
+    { to: "/view-offers", label: "View Offers"},
+    { to: "/add-packages", label: "Add Packages", roles: ["admin"] }, // Only for admin
+    { to: "/add-offers", label: "Add Offers", roles: ["admin"] }, // Only for admin
   ];
 
   // Filter links based on role
@@ -31,7 +33,7 @@ function Sidebar({ role }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 flex flex-col gap-8">
+      <nav className="flex-1 flex flex-col gap-4">
         {filteredLinks.map((link) => (
           <NavLink
             key={link.to}
@@ -39,9 +41,9 @@ function Sidebar({ role }) {
             className={({ isActive }) =>
               `block text-center py-3 rounded-md font-medium transition-colors
                ${isActive
-                 ? "bg-primary text-white shadow-md"
-                 : "bg-secondary text-white hover:bg-primary/80"
-               }`
+                ? "bg-primary text-white shadow-md"
+                : "bg-secondary text-white hover:bg-primary/80"
+              }`
             }
           >
             {link.label}
@@ -51,7 +53,12 @@ function Sidebar({ role }) {
 
       {/* Logout */}
       <div className="mt-auto pt-6 flex justify-end">
-        <button className="text-secondary hover:text-primary text-xl font-medium transition-colors">
+        <button
+          // onClick={() => {
+          //   localStorage.removeItem("user");
+          //   window.location.reload(); // redirect to login
+          // }}
+          className="text-secondary hover:text-primary text-xl font-medium transition-colors">
           Logout
         </button>
       </div>
