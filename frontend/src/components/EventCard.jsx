@@ -2,7 +2,7 @@ function EventCard({ image, title, description, date, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-2xl shadow-md p-2 w-72 h-70 cursor-pointer 
+      className="bg-gray rounded-2xl shadow-md p-2 w-72 h-70 cursor-pointer 
                  transition transform hover:scale-105 hover:shadow-xl"
     >
       {image && (
