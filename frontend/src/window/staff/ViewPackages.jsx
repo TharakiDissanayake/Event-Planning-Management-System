@@ -4,6 +4,7 @@ import logo from "../../assets/icons/logo.png";
 import chatbot from "../../assets/icons/chatbot.gif";
 import CardContainer from "../../components/CardContainer";
 import PackageCard from "../../components/PackageCard";
+import PackageDetailsPopupWindow from "../../components/PackageDetailsPopupWindow";
 
 // Example package data
 const packages = [
@@ -31,7 +32,7 @@ const packages = [
 		startDate: "2025-12-01",
 		endDate: "2026-03-31",
 	},
-    {
+	{
 		image: "https://via.placeholder.com/300x120.png?text=Silver+Package",
 		title: "Silver Package",
 		description:
@@ -55,7 +56,7 @@ const packages = [
 		startDate: "2025-12-01",
 		endDate: "2026-03-31",
 	},
-    {
+	{
 		image: "https://via.placeholder.com/300x120.png?text=Silver+Package",
 		title: "Silver Package",
 		description:
@@ -79,7 +80,7 @@ const packages = [
 		startDate: "2025-12-01",
 		endDate: "2026-03-31",
 	},
-    {
+	{
 		image: "https://via.placeholder.com/300x120.png?text=Silver+Package",
 		title: "Silver Package",
 		description:
@@ -106,20 +107,40 @@ const packages = [
 ];
 
 const packageTypes = [
-  "All Packages",
-  "Silver Package",
-  "Gold Package",
-  "Platinum Package",
+	"All Packages",
+	"Silver Package",
+	"Gold Package",
+	"Platinum Package",
 ];
 
 const ViewPackages = () => {
-  const [selectedType, setSelectedType] = useState("All Packages");
+	const [selectedType, setSelectedType] = useState("All Packages");
+	const [popupOpen, setPopupOpen] = useState(false);
+	const [selectedPackage, setSelectedPackage] = useState(null);
 
-  // Filter packages based on dropdown selection
-  const filteredPackages =
-    selectedType === "All Packages"
-      ? packages
-      : packages.filter((pkg) => pkg.title === selectedType);
+	// Filter packages based on dropdown selection
+	const filteredPackages =
+		selectedType === "All Packages"
+			? packages
+			: packages.filter((pkg) => pkg.title === selectedType);
+
+	// Handle card click to open popup
+	const handleCardClick = (pkg) => {
+		setSelectedPackage(pkg);
+		setPopupOpen(true);
+	};
+
+	// Map package data for popup (adjust as needed)
+	const getPopupData = (pkg) => ({
+		name: pkg.title,
+		category: "Event Package",
+		price: pkg.price || "",
+		hall: pkg.hall || "",
+		capacity: pkg.capacity || "",
+		includes: pkg.includes || "",
+		status: pkg.status || "",
+		// Add more fields if needed
+	});
 
 	return (
 		<div>
@@ -137,19 +158,19 @@ const ViewPackages = () => {
 					</h1>
 					{/* Dropdown to select package type */}
 					<div className="mb-6 ml-6">
-            <label className="mr-3 font-semibold text-lg text-dark">Select Package:</label>
-            <select
-              className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            >
-              {packageTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
+						<label className="mr-3 font-semibold text-lg text-dark">Select Package:</label>
+						<select
+							className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+							value={selectedType}
+							onChange={(e) => setSelectedType(e.target.value)}
+						>
+							{packageTypes.map((type) => (
+								<option key={type} value={type}>
+									{type}
+								</option>
+							))}
+						</select>
+					</div>
 					{/* Card Container with filtered packages */}
 					<div>
 						<CardContainer>
@@ -161,6 +182,7 @@ const ViewPackages = () => {
 									description={pkg.description}
 									startDate={pkg.startDate}
 									endDate={pkg.endDate}
+									onClick={() => handleCardClick(pkg)}
 								/>
 							))}
 						</CardContainer>
@@ -170,6 +192,12 @@ const ViewPackages = () => {
 						src={chatbot}
 						alt="Chatbot Logo"
 						className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
+					/>
+					{/* Popup Window */}
+					<PackageDetailsPopupWindow
+						isOpen={popupOpen}
+						onClose={() => setPopupOpen(false)}
+						packageData={selectedPackage ? getPopupData(selectedPackage) : null}
 					/>
 				</div>
 			</div>

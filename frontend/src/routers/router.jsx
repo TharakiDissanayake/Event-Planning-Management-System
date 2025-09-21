@@ -4,6 +4,7 @@ import Login from "../pages/login";
 import Home from "../window/staff/Home";
 import ViewPackages from "../window/staff/ViewPackages";
 import ViewOffers from "../window/staff/ViewOffers";
+import PackageDetailsPopupWindow from "../components/PackageDetailsPopupWindow";
 
 const router = createBrowserRouter([
     {
@@ -23,21 +24,21 @@ const router = createBrowserRouter([
                 element: <h1>Add Customer</h1>
             },
             {
-                path: "staff/add-event",
+                path: "/staff/add-event",
                 element: <h1>Add Event</h1>
             },
             {
-                path: "staff/check-customer",
+                path: "/staff/check-customer",
                 element: <h1>Check Customer</h1>
             },
             {
-                path: "staff/view-packages",
+                path: "/staff/view-packages",
                 element: <ViewPackages/>
             },
             {
-                path: "staff/view-offers",
+                path: "/staff/view-offers",
                 element: <ViewOffers />
-            }
+            },
         ]
     }
 ]);
