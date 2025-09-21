@@ -1,8 +1,10 @@
+import { useState } from "react";
 import Sidebar from "../../components/SideBar";
 import logo from "../../assets/icons/logo.png";
 import EventCard from "../../components/EventCard";
 import chatbot from "../../assets/icons/chatbot.gif"
 import CardContainer from "../../components/CardContainer";
+import EventDetailPopup from "../../components/EventDetailPopup";
 
 // Example event data
 const events = [
@@ -81,6 +83,25 @@ const events = [
 ];
 
 const Home = () => {
+    const [popupOpen, setPopupOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+
+    // Handle card click to open popup
+    const handleCardClick = (event) => {
+        setSelectedEvent(event);
+        setPopupOpen(true);
+    };
+
+    // Map event data for popup
+    const getPopupData = (event) => ({
+        customerId: "EV001",
+        customerName: "John Doe",
+        eventType: event.title,
+        eventDate: event.date,
+        status: "Confirmed",
+        image: event.image,
+    });
+
     return (
         <div>
             <div className="flex">
@@ -105,6 +126,7 @@ const Home = () => {
                                     title={event.title}
                                     description={event.description}
                                     date={event.date}
+                                    onClick={() => handleCardClick(event)}
                                 />
                             ))}
                         </CardContainer>
@@ -112,7 +134,6 @@ const Home = () => {
                     {/* Go To Calendar */}
                     <div className="mt-auto pt-6 flex justify-end mr-6">
                         <button
-                            // onClick={() => {}}
                             className="text-secondary hover:text-primary text-xl font-medium transition-colors">
                             Go To Calendar -&gt;
                         </button>
@@ -122,6 +143,13 @@ const Home = () => {
                         src={chatbot}
                         alt="Chatbot Logo"
                         className="fixed bottom-1 right-10 w-18 h-18 z-30 cursor-pointer"
+                    />
+                    {/* Event Detail Popup */}
+                    <EventDetailPopup
+                        isOpen={popupOpen}
+                        onClose={() => setPopupOpen(false)}
+                        eventData={selectedEvent ? getPopupData(selectedEvent) : null}
+                        role="staff"
                     />
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 
-const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
+const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
   if (!isOpen) return null;
 
   return (
@@ -23,33 +23,37 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
 
         {/* Title */}
         <h2 className="text-3xl font-bold text-center mb-12">
-          Offer Details
+          Event Details
         </h2>
 
         {/* Details */}
         <div className="flex flex-col gap-7 text-lg flex-1">
           <div className="flex justify-between">
-            <span className="font-semibold">Offer Name:</span>
-            <span className="border rounded px-2 py-1 w-48">{offerData?.name || "-"}</span>
+            <span className="font-semibold">Identity Number:</span>
+            <span className="border rounded px-2 py-1 w-48">{eventData?.customerId || "-"}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-semibold">Category:</span>
-            <span className="border rounded px-2 py-1 w-48">{offerData?.category || "-"}</span>
+            <span className="font-semibold">Customer Name:</span>
+            <span className="border rounded px-2 py-1 w-48">{eventData?.customerName || "-"}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-semibold">Discount:</span>
-            <span className="border rounded px-2 py-1 w-48">{offerData?.discount || "-"}</span>
+            <span className="font-semibold">Event Type:</span>
+            <span className="border rounded px-2 py-1 w-48">{eventData?.eventType || "-"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">Event Date:</span>
+            <span className="border rounded px-2 py-1 w-48">{eventData?.eventDate || "-"}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Status:</span>
-            <span className="border rounded px-2 py-1 w-48">{offerData?.status || "-"}</span>
+            <span className="border rounded px-2 py-1 w-48">{eventData?.status || "-"}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Image:</span>
-            {offerData?.image ? (
+            {eventData?.image ? (
               <img
-                src={offerData.image}
-                alt="Offer"
+                src={eventData.image}
+                alt="Event"
                 className="w-24 h-16 object-cover rounded"
               />
             ) : (
@@ -57,17 +61,15 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
             )}
           </div>
         </div>
-        {/* Edit Button for Admin */}
-        {role === "admin" && (
+        {/* Edit Button */}
           <button
             className="mt-8 w-full bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
           >
             Edit
           </button>
-        )}
       </div>
     </div>
   );
 };
 
-export default OfferDetaiPopup;
+export default EventDetailPopup;
