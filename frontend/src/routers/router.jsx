@@ -3,6 +3,7 @@ import App from "../App";
 import Login from "../pages/login";
 import Home from "../window/staff/Home";
 import ViewPackages from "../window/staff/ViewPackages";
+import ViewOffers from "../window/staff/ViewOffers";
 
 const router = createBrowserRouter([
     {
@@ -35,7 +36,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "staff/view-offers",
-                element: <h1>View Offers</h1>
+                element: <ViewOffers />
             }
         ]
     }
