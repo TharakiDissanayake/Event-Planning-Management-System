@@ -6,4 +6,11 @@
   --color-secondary: #C68EFD;
   --color-accent: #E9A5F1;
   --color-soft: #FED2E2;
+  --color-dark: #2D2A4A;
+  --color-light: #F8F7FF;
+  --color-success: #7ED957;
+  --color-warning: #FFD966;
+  --color-danger: #FF6F91;
+  --color-info: #6EC6FF;
+  --color-gray: #A0AEC0;
 }

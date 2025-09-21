@@ -4,14 +4,14 @@ import staffIcon from "../assets/icons/staff.png";
 
 function Sidebar({ role }) {
   const links = [
-    { to: "/", label: "Home" },
-    { to: "/add-customer", label: "Add Customer" },
-    { to: "/add-event", label: "Add Event" },
-    { to: "/check-customer", label: "Check Customer" },
-    { to: "/view-packages", label: "View Packages"},
-    { to: "/view-offers", label: "View Offers"},
-    { to: "/add-packages", label: "Add Packages", roles: ["admin"] }, // Only for admin
-    { to: "/add-offers", label: "Add Offers", roles: ["admin"] }, // Only for admin
+    { to: "/staff/home", label: "Home" },
+    { to: "/staff/add-customer", label: "Add Customer" },
+    { to: "/staff/add-event", label: "Add Event" },
+    { to: "/staff/check-customer", label: "Check Customer" },
+    { to: "/staff/view-packages", label: "View Packages"},
+    { to: "/staff/view-offers", label: "View Offers"},
+    { to: "/admin/add-packages", label: "Add Packages", roles: ["admin"] }, // Only for admin
+    { to: "/admin/add-offers", label: "Add Offers", roles: ["admin"] }, // Only for admin
   ];
 
   // Filter links based on role
