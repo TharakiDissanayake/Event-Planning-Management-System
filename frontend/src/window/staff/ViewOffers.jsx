@@ -4,6 +4,7 @@ import logo from "../../assets/icons/logo.png";
 import chatbot from "../../assets/icons/chatbot.gif";
 import CardContainer from "../../components/CardContainer";
 import OfferCard from "../../components/OfferCard";
+import OfferDetaiPopup from "../../components/OfferDetailsPopup";
 
 // Example offer data
 const offers = [
@@ -102,12 +103,29 @@ const offerTypes = [
 
 const ViewOffers = () => {
   const [selectedType, setSelectedType] = useState("All Offers");
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
 
   // Filter offers based on dropdown selection
   const filteredOffers =
     selectedType === "All Offers"
       ? offers
       : offers.filter((offer) => offer.title === selectedType);
+
+  // Handle card click to open popup
+  const handleCardClick = (offer) => {
+    setSelectedOffer(offer);
+    setPopupOpen(true);
+  };
+
+  // Map offer data for popup
+  const getPopupData = (offer) => ({
+    name: offer.title,
+    category: "Event Offer",
+    discount: offer.discount || "10%",
+    status: offer.status || "Active",
+    image: offer.image,
+  });
 
 	return (
 		<div>
@@ -149,6 +167,7 @@ const ViewOffers = () => {
 									description={offer.description}
 									startDate={offer.startDate}
 									endDate={offer.endDate}
+									onClick={() => handleCardClick(offer)}
 								/>
 							))}
 						</CardContainer>
@@ -158,6 +177,13 @@ const ViewOffers = () => {
 						src={chatbot}
 						alt="Chatbot Logo"
 						className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
+					/>
+					{/* Popup Window */}
+					<OfferDetaiPopup
+						isOpen={popupOpen}
+						onClose={() => setPopupOpen(false)}
+						offerData={selectedOffer ? getPopupData(selectedOffer) : null}
+						role="staff"
 					/>
 				</div>
 			</div>
