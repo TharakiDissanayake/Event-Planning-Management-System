@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import Login from "../pages/login";
 import Home from "../window/staff/Home";
+import ViewPackages from "../window/staff/ViewPackages";
 
 const router = createBrowserRouter([
     {
@@ -23,6 +24,18 @@ const router = createBrowserRouter([
             {
                 path: "staff/add-event",
                 element: <h1>Add Event</h1>
+            },
+            {
+                path: "staff/check-customer",
+                element: <h1>Check Customer</h1>
+            },
+            {
+                path: "staff/view-packages",
+                element: <ViewPackages/>
+            },
+            {
+                path: "staff/view-offers",
+                element: <h1>View Offers</h1>
             }
         ]
     }
