@@ -1,8 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
+import UpdateEventDetails from "./UpdateEventDetails";
 
 const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
+  const [isEditMode, setIsEditMode] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleEditClick = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditMode(false);
+  };
+
+  const handleSave = (updatedData) => {
+    // Handle save logic here
+    console.log("Updated event data:", updatedData);
+    setIsEditMode(false);
+    // You can add API call here to save the data
+  };
+
+  // If in edit mode, show the update component
+  if (isEditMode) {
+    return (
+      <UpdateEventDetails
+        isOpen={isEditMode}
+        onClose={handleCloseEdit}
+        eventData={eventData}
+        onSave={handleSave}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -62,11 +92,12 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
           </div>
         </div>
         {/* Edit Button */}
-          <button
-            className="mt-8 w-full bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
-          >
-            Edit
-          </button>
+        <button
+          onClick={handleEditClick}
+          className="mt-8 w-full bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
+        >
+          Edit
+        </button>
       </div>
     </div>
   );
