@@ -1,8 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
+import UpdateOfferDetails from "./UpdateOfferDetails";
 
 const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
+  const [isEditMode, setIsEditMode] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleEditClick = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditMode(false);
+  };
+
+  const handleSave = (updatedData) => {
+    // Handle save logic here
+    console.log("Updated offer data:", updatedData);
+    setIsEditMode(false);
+    // You can add API call here to save the data
+  };
+
+  // If in edit mode, show the update component
+  if (isEditMode) {
+    return (
+      <UpdateOfferDetails
+        isOpen={isEditMode}
+        onClose={handleCloseEdit}
+        offerData={offerData}
+        onSave={handleSave}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -22,7 +52,7 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
         </button>
 
         {/* Title */}
-        <h2 className="text-3xl font-bold text-center mb-12">
+        <h2 className="text-3xl font-bold text-center mb-8">
           Offer Details
         </h2>
 
@@ -39,6 +69,18 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
           <div className="flex justify-between">
             <span className="font-semibold">Discount:</span>
             <span className="border rounded px-2 py-1 w-48">{offerData?.discount || "-"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">Description:</span>
+            <span className="border rounded px-2 py-1 w-48">{offerData?.description || "-"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">Start Date:</span>
+            <span className="border rounded px-2 py-1 w-48">{offerData?.startDate || "-"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">End Date:</span>
+            <span className="border rounded px-2 py-1 w-48">{offerData?.endDate || "-"}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Status:</span>
@@ -60,7 +102,8 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
         {/* Edit Button for Admin */}
         {role === "admin" && (
           <button
-            className="mt-8 w-full bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
+            onClick={handleEditClick}
+            className="mt-2 w-full bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
           >
             Edit
           </button>

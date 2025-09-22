@@ -123,6 +123,9 @@ const ViewOffers = () => {
     name: offer.title,
     category: "Event Offer",
     discount: offer.discount || "10%",
+    description: offer.description,
+    startDate: offer.startDate,
+    endDate: offer.endDate,
     status: offer.status || "Active",
     image: offer.image,
   });
@@ -130,7 +133,7 @@ const ViewOffers = () => {
 	return (
 		<div>
 			<div className="flex">
-				<Sidebar role="staff" />
+				<Sidebar role="admin" />
 				<div className="flex-1 p-4 relative">
 					{/* Company Logo - top right */}
 					<img
@@ -183,7 +186,7 @@ const ViewOffers = () => {
 						isOpen={popupOpen}
 						onClose={() => setPopupOpen(false)}
 						offerData={selectedOffer ? getPopupData(selectedOffer) : null}
-						role="staff"
+						role="admin"
 					/>
 				</div>
 			</div>
