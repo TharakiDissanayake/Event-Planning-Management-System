@@ -3,15 +3,17 @@ import adminIcon from "../assets/icons/admin.png";
 import staffIcon from "../assets/icons/staff.png";
 
 function Sidebar({ role }) {
+  const baseRoute = role === "admin" ? "/admin" : "/staff";
+  
   const links = [
-    { to: "/staff/home", label: "Home" },
-    { to: "/staff/add-customer", label: "Add Customer" },
-    { to: "/staff/add-event", label: "Add Event" },
-    { to: "/staff/check-customer", label: "Check Customer" },
-    { to: "/staff/view-packages", label: "View Packages"},
-    { to: "/staff/view-offers", label: "View Offers"},
-    { to: "/admin/add-packages", label: "Add Packages", roles: ["admin"] }, // Only for admin
-    { to: "/admin/add-offers", label: "Add Offers", roles: ["admin"] }, // Only for admin
+    { to: `${baseRoute}/home`, label: "Home" },
+    { to: `${baseRoute}/add-customer`, label: "Add Customer" },
+    { to: `${baseRoute}/add-event`, label: "Add Event" },
+    { to: `${baseRoute}/check-customer`, label: "Check Customer" },
+    { to: `${baseRoute}/view-packages`, label: "View Packages"},
+    { to: `${baseRoute}/view-offers`, label: "View Offers"},
+    { to: `${baseRoute}/add-packages`, label: "Add Packages", roles: ["admin"] }, // Only for admin
+    { to: `${baseRoute}/add-offers`, label: "Add Offers", roles: ["admin"] }, // Only for admin
   ];
 
   // Filter links based on role
@@ -28,7 +30,6 @@ function Sidebar({ role }) {
             className="w-full h-full object-cover"
           />
         </div>
-        {/* <span className="font-semibold text-lg">Name</span> */}
         <span className="text-md text-gray-700">{role === "admin" ? "Admin" : "Staff"}</span>
       </div>
 
@@ -54,10 +55,6 @@ function Sidebar({ role }) {
       {/* Logout */}
       <div className="mt-auto pt-6 flex justify-end">
         <button
-          // onClick={() => {
-          //   localStorage.removeItem("user");
-          //   window.location.reload(); // redirect to login
-          // }}
           className="text-secondary hover:text-primary text-xl font-medium transition-colors">
           Logout
         </button>
