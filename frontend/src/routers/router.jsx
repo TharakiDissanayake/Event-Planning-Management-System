@@ -4,7 +4,6 @@ import Login from "../pages/login";
 import Home from "../window/staff/Home";
 import ViewPackages from "../window/staff/ViewPackages";
 import ViewOffers from "../window/staff/ViewOffers";
-import AdminHome from "../window/admin/AdminHome";
 
 const router = createBrowserRouter([
     {
@@ -40,8 +39,16 @@ const router = createBrowserRouter([
                 element: <ViewOffers />
             },
             {
-                path: "/admin/admin-home",
-                element: <AdminHome />
+                path: "/admin/home",
+                element: <Home />
+            },
+            {
+                path: "/admin/view-packages",
+                element: <ViewPackages/>
+            },
+            {
+                path: "/admin/view-offers",
+                element: <ViewOffers />
             },
         ]
     }

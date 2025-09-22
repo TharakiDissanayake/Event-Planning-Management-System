@@ -145,7 +145,7 @@ const ViewPackages = () => {
 	return (
 		<div>
 			<div className="flex">
-				<Sidebar role="staff" />
+				<Sidebar role="admin" />
 				<div className="flex-1 p-4 relative">
 					{/* Company Logo - top right */}
 					<img
@@ -198,6 +198,7 @@ const ViewPackages = () => {
 						isOpen={popupOpen}
 						onClose={() => setPopupOpen(false)}
 						packageData={selectedPackage ? getPopupData(selectedPackage) : null}
+						role="admin" // Add this line
 					/>
 				</div>
 			</div>
