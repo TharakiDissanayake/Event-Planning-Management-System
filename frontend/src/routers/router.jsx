@@ -4,7 +4,7 @@ import Login from "../pages/login";
 import Home from "../window/staff/Home";
 import ViewPackages from "../window/staff/ViewPackages";
 import ViewOffers from "../window/staff/ViewOffers";
-import PackageDetailsPopupWindow from "../components/PackageDetailsPopupWindow";
+import AdminHome from "../window/admin/AdminHome";
 
 const router = createBrowserRouter([
     {
@@ -38,6 +38,10 @@ const router = createBrowserRouter([
             {
                 path: "/staff/view-offers",
                 element: <ViewOffers />
+            },
+            {
+                path: "/admin/admin-home",
+                element: <AdminHome />
             },
         ]
     }
