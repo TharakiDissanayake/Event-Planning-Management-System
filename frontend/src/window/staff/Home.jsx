@@ -132,7 +132,7 @@ const Home = () => {
                         </CardContainer>
                     </div>
                     {/* Go To Calendar */}
-                    <div className="mt-auto pt-6 flex justify-end mr-6">
+                    <div className="mt-1 pt-4 flex justify-end mr-6">
                         <button
                             className="text-secondary hover:text-primary text-xl font-medium transition-colors">
                             Go To Calendar -&gt;
@@ -142,7 +142,7 @@ const Home = () => {
                     <img
                         src={chatbot}
                         alt="Chatbot Logo"
-                        className="fixed bottom-1 right-10 w-18 h-18 z-30 cursor-pointer"
+                        className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
                     />
                     {/* Event Detail Popup */}
                     <EventDetailPopup
