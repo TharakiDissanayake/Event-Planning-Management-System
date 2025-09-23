@@ -4,6 +4,7 @@ import Login from "../pages/login";
 import Home from "../window/staff/Home";
 import ViewPackages from "../window/staff/ViewPackages";
 import ViewOffers from "../window/staff/ViewOffers";
+import AddPackages from "../window/admin/AddPackages";
 
 const router = createBrowserRouter([
     {
@@ -49,6 +50,14 @@ const router = createBrowserRouter([
             {
                 path: "/admin/view-offers",
                 element: <ViewOffers />
+            },
+            {
+                path: "/admin/add-packages",
+                element: <AddPackages />
+            },
+            {
+                path: "/admin/add-offers",
+                element: <h1>Add Offers</h1>
             },
         ]
     }
