@@ -9,35 +9,40 @@ import AddOffers from "../window/admin/AddOffers";
 import AddCustomer from "../window/staff/AddCustomer";
 import AddEvent from "../window/staff/AddEvent";
 import CheckCustomer from "../window/staff/CheckCustomer";
+import ViewCalendar from "../window/staff/ViewCalendar";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App/>,
+        element: <App />,
         children: [
             {
                 path: "/login",
-                element: <Login/>
+                element: <Login />
             },
             {
                 path: "/staff/home",
-                element: <Home/>
+                element: <Home />
+            },
+            {
+                path: "/staff/view-calendar",
+                element: <ViewCalendar />
             },
             {
                 path: "/staff/add-customer",
-                element: <AddCustomer/>
+                element: <AddCustomer />
             },
             {
                 path: "/staff/add-event",
-                element: <AddEvent/>
+                element: <AddEvent />
             },
             {
                 path: "/staff/check-customer",
-                element: <CheckCustomer/>
+                element: <CheckCustomer />
             },
             {
                 path: "/staff/view-packages",
-                element: <ViewPackages/>
+                element: <ViewPackages />
             },
             {
                 path: "/staff/view-offers",
@@ -48,20 +53,24 @@ const router = createBrowserRouter([
                 element: <Home />
             },
             {
+                path: "/admin/view-calendar",
+                element: <ViewCalendar />
+            },
+            {
                 path: "/admin/add-customer",
-                element: <AddCustomer/>
+                element: <AddCustomer />
             },
             {
                 path: "/admin/add-event",
-                element: <AddEvent/>
+                element: <AddEvent />
             },
-             {
+            {
                 path: "/admin/check-customer",
-                element: <CheckCustomer/>
+                element: <CheckCustomer />
             },
             {
                 path: "/admin/view-packages",
-                element: <ViewPackages/>
+                element: <ViewPackages />
             },
             {
                 path: "/admin/view-offers",
@@ -73,7 +82,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/admin/add-offers",
-                element: <AddOffers/>
+                element: <AddOffers />
             },
         ]
     }

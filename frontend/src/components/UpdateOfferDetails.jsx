@@ -104,7 +104,7 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
             />
           </div>
           
-          {/* Description */}
+          {/* Description
           <div className="flex justify-between">
             <span className="font-semibold">Description:</span>
             <textarea
@@ -114,7 +114,7 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
               placeholder="Offer description..."
               className="border rounded px-2 py-1 w-48 h-16 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
             />
-          </div>
+          </div> */}
           
           {/* Start Date */}
           <div className="flex justify-between">

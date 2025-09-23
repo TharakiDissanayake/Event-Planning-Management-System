@@ -52,7 +52,7 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
         </button>
 
         {/* Title */}
-        <h2 className="text-3xl font-bold text-center mb-8">
+        <h2 className="text-3xl font-bold text-center mb-6">
           Offer Details
         </h2>
 
@@ -69,10 +69,6 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
           <div className="flex justify-between">
             <span className="font-semibold">Discount:</span>
             <span className="border rounded px-2 py-1 w-48">{offerData?.discount || "-"}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-semibold">Description:</span>
-            <span className="border rounded px-2 py-1 w-48">{offerData?.description || "-"}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Start Date:</span>
