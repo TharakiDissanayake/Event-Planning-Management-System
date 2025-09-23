@@ -6,6 +6,7 @@ import ViewPackages from "../window/staff/ViewPackages";
 import ViewOffers from "../window/staff/ViewOffers";
 import AddPackages from "../window/admin/AddPackages";
 import AddOffers from "../window/admin/AddOffers";
+import AddCustomer from "../window/staff/AddCustomer";
 
 const router = createBrowserRouter([
     {
@@ -43,6 +44,18 @@ const router = createBrowserRouter([
             {
                 path: "/admin/home",
                 element: <Home />
+            },
+            {
+                path: "/admin/add-customer",
+                element: <AddCustomer/>
+            },
+            {
+                path: "/admin/add-event",
+                element: <h1>Add Event</h1>
+            },
+             {
+                path: "/admin/check-customer",
+                element: <h1>Check Customer</h1>
             },
             {
                 path: "/admin/view-packages",
