@@ -5,6 +5,7 @@ import Home from "../window/staff/Home";
 import ViewPackages from "../window/staff/ViewPackages";
 import ViewOffers from "../window/staff/ViewOffers";
 import AddPackages from "../window/admin/AddPackages";
+import AddOffers from "../window/admin/AddOffers";
 
 const router = createBrowserRouter([
     {
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/admin/add-offers",
-                element: <h1>Add Offers</h1>
+                element: <AddOffers/>
             },
         ]
     }

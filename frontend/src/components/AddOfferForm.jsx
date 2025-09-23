@@ -1,15 +1,14 @@
 import React, { useState, useRef } from "react";
 
-const AddPackageForm = () => {
+const AddOfferForm = () => {
   const fileInputRef = useRef(null);
-
   const [formData, setFormData] = useState({
     name: "",
     category: "",
-    price: "",
-    hall: "",
-    capacity: "",
-    includes: "",
+    discount: "",
+    description: "",
+    startdate: "",
+    enddate: "",
     status: "",
     image: null,
   });
@@ -31,10 +30,10 @@ const AddPackageForm = () => {
     setFormData({
       name: "",
       category: "",
-      price: "",
-      hall: "",
-      capacity: "",
-      includes: "",
+      discount: "",
+      description: "",
+      startdate: "",
+      enddate: "",
       status: "",
       image: null,
     });
@@ -47,13 +46,13 @@ const AddPackageForm = () => {
 
   return (
     <div className="bg-white shadow-md p-8 w-[1200px]">
-      <h2 className="text-3xl font-bold text-center mb-8">Package Details</h2>
+      <h2 className="text-3xl font-bold text-center mb-8">Offer Details</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Package Name */}
         <div className="grid grid-cols-2 gap-4 items-center">
           <label className="text-lg font-semibold text-gray-700">
-            Package Name:
+            Offer Name:
           </label>
           <input
             type="text"
@@ -83,49 +82,51 @@ const AddPackageForm = () => {
 
         {/* Price */}
         <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Price:</label>
+          <label className="text-lg font-semibold text-gray-700">Discount:</label>
           <input
             type="number"
-            name="price"
-            value={formData.price}
+            name="discount"
+            value={formData.discount}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
           />
         </div>
 
-        {/* Hall */}
+        {/* Description */}
         <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Hall:</label>
-          <input
-            type="text"
-            name="hall"
-            value={formData.hall}
-            onChange={handleChange}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
-        </div>
-
-        {/* Capacity */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Capacity:</label>
-          <input
-            type="number"
-            name="capacity"
-            value={formData.capacity}
-            onChange={handleChange}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
-        </div>
-
-        {/* Includes */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Includes:</label>
+          <label className="text-lg font-semibold text-gray-700">
+            Description:
+          </label>
           <textarea
-            name="includes"
-            value={formData.includes}
+            name="description"
+            value={formData.description}
             onChange={handleChange}
             rows="3"
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+          />
+        </div>
+
+        {/* Start Date */}
+        <div className="grid grid-cols-2 gap-4 items-center">
+          <label className="text-lg font-semibold text-gray-700">Start Date:</label>
+          <input
+            type="date"
+            name="startdate"
+            value={formData.startdate}
+            onChange={handleChange}
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+          />
+        </div>
+
+        {/* End Date */}
+        <div className="grid grid-cols-2 gap-4 items-center">
+          <label className="text-lg font-semibold text-gray-700">End Date:</label>
+          <input
+            type="date"
+            name="enddate"
+            value={formData.enddate}
+            onChange={handleChange}
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
           />
         </div>
 
@@ -177,4 +178,4 @@ const AddPackageForm = () => {
   );
 };
 
-export default AddPackageForm;
+export default AddOfferForm;
