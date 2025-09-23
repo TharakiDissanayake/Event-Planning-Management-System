@@ -170,7 +170,7 @@ const AddOfferForm = () => {
             type="submit"
             className="bg-purple-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-purple-600 transition"
           >
-            Save Package
+            Save 
           </button>
         </div>
       </form>
