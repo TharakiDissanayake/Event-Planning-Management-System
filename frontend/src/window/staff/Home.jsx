@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Add this import
 import Sidebar from "../../components/SideBar";
 import logo from "../../assets/icons/logo.png";
 import EventCard from "../../components/EventCard";
@@ -83,6 +84,7 @@ const events = [
 ];
 
 const Home = () => {
+    const navigate = useNavigate(); // Add this
     const [popupOpen, setPopupOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -90,6 +92,11 @@ const Home = () => {
     const handleCardClick = (event) => {
         setSelectedEvent(event);
         setPopupOpen(true);
+    };
+
+    // Handle Go to Calendar click
+    const handleGoToCalendar = () => {
+        navigate('/admin/view-calendar'); // or '/staff/view-calendar' based on role
     };
 
     // Map event data for popup
@@ -105,7 +112,7 @@ const Home = () => {
     return (
         <div>
             <div className="flex">
-                <Sidebar role="staff" />
+                <Sidebar role="admin" />
                 <div className="flex-1 p-4 relative">
                     {/* Company Logo - top right */}
                     <img
@@ -134,7 +141,9 @@ const Home = () => {
                     {/* Go To Calendar */}
                     <div className="mt-1 pt-4 flex justify-end mr-6">
                         <button
-                            className="text-secondary hover:text-primary text-xl font-medium transition-colors">
+                            onClick={handleGoToCalendar}
+                            className="text-secondary hover:text-primary text-xl font-medium transition-colors"
+                        >
                             Go To Calendar -&gt;
                         </button>
                     </div>
@@ -149,7 +158,7 @@ const Home = () => {
                         isOpen={popupOpen}
                         onClose={() => setPopupOpen(false)}
                         eventData={selectedEvent ? getPopupData(selectedEvent) : null}
-                        role="staff"
+                        role="admin"
                     />
                 </div>
             </div>
