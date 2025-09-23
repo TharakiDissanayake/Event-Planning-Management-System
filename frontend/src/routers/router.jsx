@@ -7,6 +7,7 @@ import ViewOffers from "../window/staff/ViewOffers";
 import AddPackages from "../window/admin/AddPackages";
 import AddOffers from "../window/admin/AddOffers";
 import AddCustomer from "../window/staff/AddCustomer";
+import AddEvent from "../window/staff/AddEvent";
 
 const router = createBrowserRouter([
     {
@@ -23,11 +24,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/staff/add-customer",
-                element: <h1>Add Customer</h1>
+                element: <AddCustomer/>
             },
             {
                 path: "/staff/add-event",
-                element: <h1>Add Event</h1>
+                element: <AddEvent/>
             },
             {
                 path: "/staff/check-customer",
@@ -51,7 +52,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/admin/add-event",
-                element: <h1>Add Event</h1>
+                element: <AddEvent/>
             },
              {
                 path: "/admin/check-customer",

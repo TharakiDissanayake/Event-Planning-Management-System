@@ -105,7 +105,7 @@ const Home = () => {
     return (
         <div>
             <div className="flex">
-                <Sidebar role="admin" />
+                <Sidebar role="staff" />
                 <div className="flex-1 p-4 relative">
                     {/* Company Logo - top right */}
                     <img
@@ -149,7 +149,7 @@ const Home = () => {
                         isOpen={popupOpen}
                         onClose={() => setPopupOpen(false)}
                         eventData={selectedEvent ? getPopupData(selectedEvent) : null}
-                        role="admin"
+                        role="staff"
                     />
                 </div>
             </div>
