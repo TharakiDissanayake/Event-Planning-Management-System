@@ -22,6 +22,16 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
     // You can add API call here to save the data
   };
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this package?")) {
+      // Handle delete logic here
+      console.log("Deleting package:", packageData);
+      // Add API call here to delete the package
+      alert("Package deleted successfully!");
+      onClose(); // Close the popup after deletion
+    }
+  };
+
   // If in edit mode, show the update component
   if (isEditMode) {
     return (
@@ -99,14 +109,23 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
             )}
           </div>
         </div>
-        {/* Edit Button for Admin */}
+        
+        {/* Delete and Edit Buttons - Only for Admin */}
         {role === "admin" && (
-          <button
-            onClick={handleEditClick}
-            className="mt-8 w-full bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
-          >
-            Edit
-          </button>
+          <div className="flex justify-between mt-8 gap-4">
+            <button
+              onClick={handleDelete}
+              className="flex-1 bg-red-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-red-600 transition"
+            >
+              Delete
+            </button>
+            <button
+              onClick={handleEditClick}
+              className="flex-1 bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
+            >
+              Edit
+            </button>
+          </div>
         )}
       </div>
     </div>
