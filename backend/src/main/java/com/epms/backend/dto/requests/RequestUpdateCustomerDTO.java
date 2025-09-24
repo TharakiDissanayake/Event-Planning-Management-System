@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class RequestUpdateCustomerDTO {
     private String customerEmail;
-    private String contactNumber;
+    private String contactNumber1;
+    private String contactNumber2;
     private String address;
 }

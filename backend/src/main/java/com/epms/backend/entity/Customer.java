@@ -24,8 +24,11 @@ public class Customer {
     @Column(name = "customer_email", nullable = false, unique = true)
     private String customerEmail;
 
-    @Column(name = "contact_number", length = 10, nullable = false)
-    private String contactNumber;
+    @Column(name = "contact_number1", length = 10, nullable = false)
+    private String contactNumber1;
+
+    @Column(name = "contact_number2", length = 10, nullable = false)
+    private String contactNumber2;
 
     @Column(name = "address", length = 200, nullable = false)
     private String address;
