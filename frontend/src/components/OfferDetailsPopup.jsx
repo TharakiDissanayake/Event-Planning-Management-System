@@ -22,6 +22,16 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
     // You can add API call here to save the data
   };
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this offer?")) {
+      // Handle delete logic here
+      console.log("Deleting offer:", offerData);
+      // Add API call here to delete the offer
+      alert("Offer deleted successfully!");
+      onClose(); // Close the popup after deletion
+    }
+  };
+
   // If in edit mode, show the update component
   if (isEditMode) {
     return (
@@ -95,14 +105,23 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
             )}
           </div>
         </div>
-        {/* Edit Button for Admin */}
+        
+        {/* Delete and Edit Buttons - Only for Admin */}
         {role === "admin" && (
-          <button
-            onClick={handleEditClick}
-            className="mt-2 w-full bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
-          >
-            Edit
-          </button>
+          <div className="flex justify-between mt-8 gap-4">
+            <button
+              onClick={handleDelete}
+              className="flex-1 bg-red-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-red-600 transition"
+            >
+              Delete
+            </button>
+            <button
+              onClick={handleEditClick}
+              className="flex-1 bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
+            >
+              Edit
+            </button>
+          </div>
         )}
       </div>
     </div>
