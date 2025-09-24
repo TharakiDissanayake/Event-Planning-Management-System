@@ -1,5 +1,6 @@
 package com.epms.backend.entity;
 
+import com.epms.backend.entity.enums.EventCategory;
 import com.epms.backend.entity.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,30 +22,24 @@ public class Event {
     @Column(name = "event_id", nullable = false)
     private int eventId;
 
-    @Column(name = "event_name", length = 200, nullable = false)
-    private String eventName;
+    @Enumerated
+    @Column(name = "event_category", nullable = false)
+    private EventCategory eventCategory;
 
-    @Column(name = "event_type", nullable = false)
-    private String eventType;
+    @Column(name = "event_title", length = 200, nullable = false)
+    private String eventTitle;
 
     @Column(name = "event_date", nullable = false)
     private LocalDate eventDate;
 
     @Column(name = "start_time", nullable = false)
-    private LocalTime startTime;
-
-    @Column(name = "end_time", nullable = false)
-    private LocalTime endTime;
+    private String startTime;
 
     @Enumerated
     @Column(name = "status", nullable = false)
     private Status status;
 
     @ManyToOne
-    @JoinColumn(name = "customer", nullable = false)
-    private Customer customer;
-
-    @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
+    @JoinColumn(name = "identity_number", nullable = false)
+    private Customer identityNumber;
 }

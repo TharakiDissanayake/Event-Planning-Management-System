@@ -1,6 +1,9 @@
 package com.epms.backend.dto;
 
+import com.epms.backend.entity.enums.EventCategory;
 import com.epms.backend.entity.enums.PackageCategory;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,8 +13,11 @@ import lombok.NoArgsConstructor;
 @Data
 public class PackageDataDTO {
     private int packageId;
-    private PackageCategory packageCategory;
     private String packageName;
-    private String packageDescription;
+    private PackageCategory packageCategory;
+    private int capacity;
+    private String includes;
+    private EventCategory eventCategory;
     private int packagePrice;
+    private boolean packageStatus;
 }
