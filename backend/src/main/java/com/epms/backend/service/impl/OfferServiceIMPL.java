@@ -7,7 +7,7 @@ import com.epms.backend.dto.requests.RequestSaveOfferDTO;
 import com.epms.backend.dto.requests.RequestUpdateOfferDTO;
 import com.epms.backend.dto.responses.ResponseGetAllOffers;
 import com.epms.backend.entity.Customer;
-import com.epms.backend.entity.Offer;;
+import com.epms.backend.entity.Offer;
 import com.epms.backend.entity.PackageData;
 import com.epms.backend.exceptions.NotFoundException;
 import com.epms.backend.repository.OfferRepository;

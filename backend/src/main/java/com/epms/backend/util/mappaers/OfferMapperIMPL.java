@@ -49,6 +49,7 @@ public class OfferMapperIMPL implements OfferMapper{
         offerDTO.setEventCategories(offer.getEventCategories());
         offerDTO.setOfferDescription(offer.getOfferDescription());
         offerDTO.setOfferStatus(offer.isOfferStatus());
+        return offerDTO;
     }
 
     public ResponseGetAllOffers EntityToDTO(Offer offer) {
