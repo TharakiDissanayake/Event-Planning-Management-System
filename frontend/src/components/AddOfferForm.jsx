@@ -1,16 +1,16 @@
-import React, { useState, useRef } from "react";
+﻿import React, { useState, useRef } from "react";
 
 const AddOfferForm = () => {
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    discount: "",
-    description: "",
-    startdate: "",
-    enddate: "",
-    status: "",
-    image: null,
+    offerName: "",
+    discountPercentage: "",
+    startDate: "",
+    endDate: "",
+    packageCategory: [],
+    eventCategory: [],
+    offerDescription: "",
+    offerStatus: true,
   });
 
   const handleChange = (e) => {
@@ -28,14 +28,14 @@ const AddOfferForm = () => {
 
   const handleCancel = () => {
     setFormData({
-      name: "",
-      category: "",
-      discount: "",
-      description: "",
-      startdate: "",
-      enddate: "",
-      status: "",
-      image: null,
+      offerName: "",
+      discountPercentage: "",
+      startDate: "",
+      endDate: "",
+      packageCategory: [],
+      eventCategory: [],
+      offerDescription: "",
+      offerStatus: true,
     });
 
     // Reset the file input using ref
@@ -56,65 +56,37 @@ const AddOfferForm = () => {
           </label>
           <input
             type="text"
-            name="name"
-            value={formData.name}
+            name="offerName"
+            value={formData.offerName}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
           />
         </div>
 
-        {/* Category Dropdown */}
+        {/* Discount Percentage */}
         <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Category:</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          >
-            <option value="">Select Category</option>
-            <option value="standard">Standard</option>
-            <option value="premium">Premium</option>
-            <option value="corporate">Corporate</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-
-        {/* Price */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Discount:</label>
+          <label className="text-lg font-semibold text-gray-700">Discount Percentage:</label>
           <input
             type="number"
-            name="discount"
-            value={formData.discount}
+            name="discountPercentage"
+            value={formData.discountPercentage}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
           />
         </div>
 
-        {/* Description */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">
-            Description:
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows="3"
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
-          />
-        </div>
-
-        {/* Start Date */}
+         {/* Start Date */}
         <div className="grid grid-cols-2 gap-4 items-center">
           <label className="text-lg font-semibold text-gray-700">Start Date:</label>
           <input
             type="date"
-            name="startdate"
-            value={formData.startdate}
+            name="startDate"
+            value={formData.startDate}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
           />
         </div>
 
@@ -123,10 +95,82 @@ const AddOfferForm = () => {
           <label className="text-lg font-semibold text-gray-700">End Date:</label>
           <input
             type="date"
-            name="enddate"
-            value={formData.enddate}
+            name="endDate"
+            value={formData.endDate}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
+          />
+        </div>
+
+        {/* Package Category */}
+        <div className="grid grid-cols-2 gap-4 items-center">
+          <label className="text-lg font-semibold text-gray-700">Package Category:</label>
+          <div className="space-y-2">
+            {[
+              { value: "PLATINUM", label: "Platinum" },
+              { value: "GOLD", label: "Gold" },
+              { value: "SILVER", label: "Silver" }
+            ].map((packageType) => (
+              <label key={packageType.value} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="packageCategory"
+                  value={packageType.value}
+                  checked={formData.packageCategory.includes(packageType.value)}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                />
+                <span className="text-sm text-gray-700">{packageType.label}</span>
+              </label>
+            ))}
+            {formData.packageCategory.length === 0 && (
+              <p className="text-sm text-red-500 mt-1">Please select at least one package type</p>
+            )}
+          </div>
+        </div>
+
+         {/*Event Category */}
+        <div className="grid grid-cols-2 gap-4 items-center">
+          <label className="text-lg font-semibold text-gray-700">Event Category:</label>
+          <div className="space-y-2">
+            {[
+              { value: "WEDDING", label: "Wedding" },
+              { value: "ENGAGEMENT_PARTY", label: "Engagement Party" },
+              { value: "BIRTHDAY_PARTY", label: "Birthday Party" },
+              { value: "ANNEVASARY_CELEBRATION", label: "Anniversary Celebration" },
+              { value: "CORPARATE_MEETING", label: "Corporate Meeting" },
+              { value: "CONFERENCE_SEMINAR", label: "Conference/Seminar" }
+            ].map((eventType) => (
+              <label key={eventType.value} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="eventCategory"
+                  value={eventType.value}
+                  checked={formData.eventCategory.includes(eventType.value)}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                />
+                <span className="text-sm text-gray-700">{eventType.label}</span>
+              </label>
+            ))}
+            {formData.eventCategory.length === 0 && (
+              <p className="text-sm text-red-500 mt-1">Please select at least one event type</p>
+            )}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="grid grid-cols-2 gap-4 items-center">
+          <label className="text-lg font-semibold text-gray-700">
+            Description:
+          </label>
+          <textarea
+            name="offerDescription"
+            value={formData.offerDescription}
+            onChange={handleChange}
+            rows="3"
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
           />
         </div>
 
@@ -138,23 +182,11 @@ const AddOfferForm = () => {
             value={formData.status}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
           >
-            <option value="">Select Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-        </div>
-
-        {/* Image Upload */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Image:</label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            name="image"
-            onChange={handleChange}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
         </div>
 
         {/* Submit and Cancel Buttons */}
@@ -170,7 +202,7 @@ const AddOfferForm = () => {
             type="submit"
             className="bg-purple-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-purple-600 transition"
           >
-            Save 
+            Save
           </button>
         </div>
       </form>

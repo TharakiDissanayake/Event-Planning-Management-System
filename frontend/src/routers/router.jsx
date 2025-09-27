@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../App";
 import Login from "../pages/login";
 import Home from "../window/staff/Home";
@@ -10,6 +10,7 @@ import AddCustomer from "../window/staff/AddCustomer";
 import AddEvent from "../window/staff/AddEvent";
 import CheckCustomer from "../window/staff/CheckCustomer";
 import ViewCalendar from "../window/staff/ViewCalendar";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
     {
@@ -17,72 +18,76 @@ const router = createBrowserRouter([
         element: <App />,
         children: [
             {
+                path: "/",
+                element: <Navigate to="/login" replace />
+            },
+            {
                 path: "/login",
                 element: <Login />
             },
             {
                 path: "/staff/home",
-                element: <Home />
+                element: <ProtectedRoute requiredRole="STAFF"><Home /></ProtectedRoute>
             },
             {
                 path: "/staff/view-calendar",
-                element: <ViewCalendar />
+                element: <ProtectedRoute requiredRole="STAFF"><ViewCalendar /></ProtectedRoute>
             },
             {
                 path: "/staff/add-customer",
-                element: <AddCustomer />
+                element: <ProtectedRoute requiredRole="STAFF"><AddCustomer /></ProtectedRoute>
             },
             {
                 path: "/staff/add-event",
-                element: <AddEvent />
+                element: <ProtectedRoute requiredRole="STAFF"><AddEvent /></ProtectedRoute>
             },
             {
                 path: "/staff/check-customer",
-                element: <CheckCustomer />
+                element: <ProtectedRoute requiredRole="STAFF"><CheckCustomer /></ProtectedRoute>
             },
             {
                 path: "/staff/view-packages",
-                element: <ViewPackages />
+                element: <ProtectedRoute requiredRole="STAFF"><ViewPackages /></ProtectedRoute>
             },
             {
                 path: "/staff/view-offers",
-                element: <ViewOffers />
+                element: <ProtectedRoute requiredRole="STAFF"><ViewOffers /></ProtectedRoute>
             },
             {
                 path: "/admin/home",
-                element: <Home />
+                element: <ProtectedRoute requiredRole="ADMIN"><Home /></ProtectedRoute>
             },
             {
                 path: "/admin/view-calendar",
-                element: <ViewCalendar />
+                element: <ProtectedRoute requiredRole="ADMIN"><ViewCalendar /></ProtectedRoute>
             },
             {
                 path: "/admin/add-customer",
-                element: <AddCustomer />
+                element: <ProtectedRoute requiredRole="ADMIN"><AddCustomer /></ProtectedRoute>
             },
             {
                 path: "/admin/add-event",
-                element: <AddEvent />
+                element: <ProtectedRoute requiredRole="ADMIN"><AddEvent /></ProtectedRoute>
             },
             {
                 path: "/admin/check-customer",
-                element: <CheckCustomer />
+                element: <ProtectedRoute requiredRole="ADMIN"><CheckCustomer /></ProtectedRoute>
             },
             {
                 path: "/admin/view-packages",
-                element: <ViewPackages />
+                element: <ProtectedRoute requiredRole="ADMIN"><ViewPackages /></ProtectedRoute>
             },
             {
                 path: "/admin/view-offers",
-                element: <ViewOffers />
+                element: <ProtectedRoute requiredRole="ADMIN"><ViewOffers /></ProtectedRoute>
             },
             {
                 path: "/admin/add-packages",
-                element: <AddPackages />
+                element: <ProtectedRoute requiredRole="ADMIN"><AddPackages /></ProtectedRoute>
             },
             {
                 path: "/admin/add-offers",
-                element: <AddOffers />
+                element: <ProtectedRoute requiredRole="ADMIN"><AddOffers /></ProtectedRoute>
             },
         ]
     }

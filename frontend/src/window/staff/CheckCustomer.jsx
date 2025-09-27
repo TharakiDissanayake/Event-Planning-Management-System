@@ -9,7 +9,7 @@ const CheckCustomer = () => {
     return (
         <div className="h-screen overflow-hidden"> {/* Add this */}
             <div className="flex h-full"> {/* Add h-full */}
-                <Sidebar role="admin" />
+                <Sidebar />
                 <div className="flex-1 p-4 relative flex flex-col"> {/* Add flex flex-col */}
                     {/* Company Logo - top right */}
                     <img

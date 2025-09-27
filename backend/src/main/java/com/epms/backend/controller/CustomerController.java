@@ -29,7 +29,7 @@ public class CustomerController {
             path = {"/get-customer-by-id"},
             params = "id"
     )
-    public ResponseEntity<StandardResponse> getCustomerById(@RequestParam(value = "id") int customerId){
+    public ResponseEntity<StandardResponse> getCustomerById(@RequestParam(value = "id") String customerId){
         CustomerDTO customerDTO = customerService.getCustomerById(customerId);
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "SUCCESS", customerDTO), HttpStatus.OK);
     }
@@ -38,7 +38,7 @@ public class CustomerController {
             path = {"/update-customer"},
             params = "id"
     )
-    public ResponseEntity<StandardResponse> updateCustomer(@RequestBody RequestUpdateCustomerDTO requestUpdateCustomerDTO, @RequestParam(value = "id") int customerId){
+    public ResponseEntity<StandardResponse> updateCustomer(@RequestBody RequestUpdateCustomerDTO requestUpdateCustomerDTO, @RequestParam(value = "id") String customerId){
         String message = customerService.updateCustomer(requestUpdateCustomerDTO, customerId);
         return new ResponseEntity<StandardResponse>(new StandardResponse(201, "SUCCESS", message), HttpStatus.CREATED);
     }

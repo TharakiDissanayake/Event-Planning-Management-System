@@ -2,18 +2,72 @@ package com.epms.backend.dto.requests;
 
 import com.epms.backend.entity.enums.EventCategory;
 import com.epms.backend.entity.enums.PackageCategory;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
 public class RequestUpdatePackageDataDTO {
     private PackageCategory packageCategory;
     private int capacity;
     private String includes;
-    private EventCategory eventCategory;
+    private List<EventCategory> eventCategories;
     private int packagePrice;
     private boolean packageStatus;
+
+    public RequestUpdatePackageDataDTO() {}
+
+    public RequestUpdatePackageDataDTO(PackageCategory packageCategory, int capacity, String includes, List<EventCategory> eventCategories, int packagePrice, boolean packageStatus) {
+        this.packageCategory = packageCategory;
+        this.capacity = capacity;
+        this.includes = includes;
+        this.eventCategories = eventCategories;
+        this.packagePrice = packagePrice;
+        this.packageStatus = packageStatus;
+    }
+
+    public PackageCategory getPackageCategory() {
+        return packageCategory;
+    }
+
+    public void setPackageCategory(PackageCategory packageCategory) {
+        this.packageCategory = packageCategory;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getIncludes() {
+        return includes;
+    }
+
+    public void setIncludes(String includes) {
+        this.includes = includes;
+    }
+
+    public List<EventCategory> getEventCategories() {
+        return eventCategories;
+    }
+
+    public void setEventCategories(List<EventCategory> eventCategories) {
+        this.eventCategories = eventCategories;
+    }
+
+    public int getPackagePrice() {
+        return packagePrice;
+    }
+
+    public void setPackagePrice(int packagePrice) {
+        this.packagePrice = packagePrice;
+    }
+
+    public boolean isPackageStatus() {
+        return packageStatus;
+    }
+
+    public void setPackageStatus(boolean packageStatus) {
+        this.packageStatus = packageStatus;
+    }
 }

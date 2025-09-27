@@ -5,6 +5,7 @@ import chatbot from "../../assets/icons/chatbot.gif";
 import CardContainer from "../../components/CardContainer";
 import OfferCard from "../../components/OfferCard";
 import OfferDetaiPopup from "../../components/OfferDetailsPopup";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Example offer data
 const offers = [
@@ -102,9 +103,13 @@ const offerTypes = [
 ];
 
 const ViewOffers = () => {
+  const { user } = useAuth();
   const [selectedType, setSelectedType] = useState("All Offers");
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
+
+  // Get user role
+  const userRole = user?.userRole?.toLowerCase() || user?.role?.toLowerCase() || "staff";
 
   // Filter offers based on dropdown selection
   const filteredOffers =
@@ -133,7 +138,7 @@ const ViewOffers = () => {
 	return (
 		<div>
 			<div className="flex">
-				<Sidebar role="admin" />
+				<Sidebar />
 				<div className="flex-1 p-4 relative">
 					{/* Company Logo - top right */}
 					<img
@@ -186,7 +191,7 @@ const ViewOffers = () => {
 						isOpen={popupOpen}
 						onClose={() => setPopupOpen(false)}
 						offerData={selectedOffer ? getPopupData(selectedOffer) : null}
-						role="admin"
+						role={userRole}
 					/>
 				</div>
 			</div>

@@ -1,43 +1,142 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { packageService } from "../services/packageService";
+import { useAuth } from "../contexts/AuthContext";
+import useFormPersistence from "../hooks/useFormPersistence";
 
 const AddPackageForm = () => {
+  const { user } = useAuth();
+  const { saveFormData, restoreFormData, clearFormData } = useFormPersistence();
   const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    price: "",
-    hall: "",
+    packageName: "",
+    packageCategory: "",
     capacity: "",
     includes: "",
-    status: "",
-    image: null,
+    eventCategory: [], // Changed to array for multiple selections
+    packagePrice: "",
+    packageStatus: true, // Default to active
   });
 
+  // Restore saved form data on mount
+  useEffect(() => {
+    const savedData = restoreFormData('packageForm');
+    if (savedData) {
+      setFormData(savedData);
+      setMessage({ 
+        type: 'info', 
+        text: 'Your previous form data has been restored.' 
+      });
+    }
+  }, [restoreFormData]);
+
+  // Auto-save form data when it changes (with debounce)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.packageName || formData.packageCategory || formData.capacity) {
+        saveFormData('packageForm', formData);
+      }
+    }, 2000); // Save after 2 seconds of no changes
+
+    return () => clearTimeout(timer);
+  }, [formData, saveFormData]);
+
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value, type, checked } = e.target;
+    let processedValue = value;
+    
+    // Handle boolean conversion for packageStatus
+    if (name === "packageStatus") {
+      processedValue = value === "true";
+    }
+    // Handle number conversion for capacity and price
+    else if (name === "capacity" || name === "packagePrice") {
+      processedValue = value === "" ? "" : parseInt(value);
+    }
+    // Handle checkbox array for eventCategory
+    else if (name === "eventCategory" && type === "checkbox") {
+      if (checked) {
+        // Add to array if checked
+        processedValue = [...formData.eventCategory, value];
+      } else {
+        // Remove from array if unchecked
+        processedValue = formData.eventCategory.filter(item => item !== value);
+      }
+    }
+
     setFormData({
       ...formData,
-      [name]: files ? files[0] : value,
+      [name]: processedValue,
     });
+
+    // Clear message when user starts typing
+    if (message.text) {
+      setMessage({ type: '', text: '' });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
+    setLoading(true);
+    setMessage({ type: '', text: '' });
+
+    // Validation: Ensure at least one event category is selected
+    if (formData.eventCategory.length === 0) {
+      setMessage({ 
+        type: 'error', 
+        text: 'Please select at least one event type.' 
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Prepare data for API
+      const packageData = {
+        packageName: formData.packageName,
+        packageCategory: formData.packageCategory,
+        capacity: parseInt(formData.capacity),
+        includes: formData.includes,
+        eventCategories: formData.eventCategory, // Send full array of selected categories
+        packagePrice: parseInt(formData.packagePrice),
+        packageStatus: formData.packageStatus
+      };
+
+      const response = await packageService.createPackage(packageData);
+      setMessage({ 
+        type: 'success', 
+        text: 'Package created successfully!' 
+      });
+      
+      // Clear saved form data on successful submission
+      clearFormData('packageForm');
+      
+      // Reset form after successful submission
+      handleCancel();
+    } catch (error) {
+      console.error('Error creating package:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error.message || error.data || 'Failed to create package. Please try again.' 
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
     setFormData({
-      name: "",
-      category: "",
-      price: "",
-      hall: "",
+      packageName: "",
+      packageCategory: "",
       capacity: "",
       includes: "",
-      status: "",
-      image: null,
+      eventCategory: [], // Reset to empty array
+      packagePrice: "",
+      packageStatus: true,
     });
+    setMessage({ type: '', text: '' });
 
     // Reset the file input using ref
     if (fileInputRef.current) {
@@ -49,6 +148,17 @@ const AddPackageForm = () => {
     <div className="bg-white shadow-md p-8 w-[1200px]">
       <h2 className="text-3xl font-bold text-center mb-8">Package Details</h2>
 
+      {/* Success/Error Message */}
+      {message.text && (
+        <div className={`mb-6 p-4 rounded-md text-center ${
+          message.type === 'success' 
+            ? 'bg-green-100 text-green-800 border border-green-300' 
+            : 'bg-red-100 text-red-800 border border-red-300'
+        }`}>
+          {message.text}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Package Name */}
         <div className="grid grid-cols-2 gap-4 items-center">
@@ -57,52 +167,29 @@ const AddPackageForm = () => {
           </label>
           <input
             type="text"
-            name="name"
-            value={formData.name}
+            name="packageName"
+            value={formData.packageName}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
           />
         </div>
 
-        {/* Category Dropdown */}
+        {/* Package Category Dropdown */}
         <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Category:</label>
+          <label className="text-lg font-semibold text-gray-700">Package Category:</label>
           <select
-            name="category"
-            value={formData.category}
+            name="packageCategory"
+            value={formData.packageCategory}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
           >
             <option value="">Select Category</option>
-            <option value="standard">Standard</option>
-            <option value="premium">Premium</option>
-            <option value="corporate">Corporate</option>
-            <option value="custom">Custom</option>
+            <option value="PLATINAM">Platinum</option>
+            <option value="GOLD">Gold</option>
+            <option value="SILVER">Silver</option>
           </select>
-        </div>
-
-        {/* Price */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Price:</label>
-          <input
-            type="number"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
-        </div>
-
-        {/* Hall */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Hall:</label>
-          <input
-            type="text"
-            name="hall"
-            value={formData.hall}
-            onChange={handleChange}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
         </div>
 
         {/* Capacity */}
@@ -114,6 +201,8 @@ const AddPackageForm = () => {
             value={formData.capacity}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            min="1"
+            required
           />
         </div>
 
@@ -126,6 +215,51 @@ const AddPackageForm = () => {
             onChange={handleChange}
             rows="3"
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+            required
+          />
+        </div>
+
+        {/* Event Type Checkboxes */}
+        <div className="grid grid-cols-2 gap-4">
+          <label className="text-lg font-semibold text-gray-700">Event Types:</label>
+          <div className="space-y-2">
+            {[
+              { value: "WEDDING", label: "Wedding" },
+              { value: "ENGAGEMENT_PARTY", label: "Engagement Party" },
+              { value: "BIRTHDAY_PARTY", label: "Birthday Party" },
+              { value: "ANNEVASARY_CELEBRATION", label: "Anniversary Celebration" },
+              { value: "CORPARATE_MEETING", label: "Corporate Meeting" },
+              { value: "CONFERENCE_SEMINAR", label: "Conference/Seminar" }
+            ].map((eventType) => (
+              <label key={eventType.value} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="eventCategory"
+                  value={eventType.value}
+                  checked={formData.eventCategory.includes(eventType.value)}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                />
+                <span className="text-sm text-gray-700">{eventType.label}</span>
+              </label>
+            ))}
+            {formData.eventCategory.length === 0 && (
+              <p className="text-sm text-red-500 mt-1">Please select at least one event type</p>
+            )}
+          </div>
+        </div>
+
+        {/* Price */}
+        <div className="grid grid-cols-2 gap-4 items-center">
+          <label className="text-lg font-semibold text-gray-700">Price:</label>
+          <input
+            type="number"
+            name="packagePrice"
+            value={formData.packagePrice}
+            onChange={handleChange}
+            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            min="0"
+            required
           />
         </div>
 
@@ -133,27 +267,15 @@ const AddPackageForm = () => {
         <div className="grid grid-cols-2 gap-4 items-center">
           <label className="text-lg font-semibold text-gray-700">Status:</label>
           <select
-            name="status"
-            value={formData.status}
+            name="packageStatus"
+            value={formData.packageStatus.toString()}
             onChange={handleChange}
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            required
           >
-            <option value="">Select Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
           </select>
-        </div>
-
-        {/* Image Upload */}
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Image:</label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            name="image"
-            onChange={handleChange}
-            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
         </div>
 
         {/* Submit and Cancel Buttons */}
@@ -161,15 +283,17 @@ const AddPackageForm = () => {
           <button
             type="button"
             onClick={handleCancel}
-            className="bg-gray-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-gray-600 transition"
+            disabled={loading}
+            className="bg-gray-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-gray-600 transition disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="bg-purple-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-purple-600 transition"
+            disabled={loading}
+            className="bg-purple-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-purple-600 transition disabled:opacity-50"
           >
-            Save 
+            {loading ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

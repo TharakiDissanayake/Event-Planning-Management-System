@@ -6,7 +6,7 @@ import com.epms.backend.dto.requests.RequestUpdateCustomerDTO;
 public interface CustomerService {
     String saveCustomer(CustomerDTO customerDTO);
 
-    CustomerDTO getCustomerById(int customerId);
+    CustomerDTO getCustomerById(String customerId);
 
-    String updateCustomer(RequestUpdateCustomerDTO requestUpdateCustomerDTO, int customerId);
+    String updateCustomer(RequestUpdateCustomerDTO requestUpdateCustomerDTO, String customerId);
 }

@@ -112,7 +112,7 @@ const Home = () => {
     return (
         <div>
             <div className="flex">
-                <Sidebar role="admin" />
+                <Sidebar />
                 <div className="flex-1 p-4 relative">
                     {/* Company Logo - top right */}
                     <img

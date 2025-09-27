@@ -5,6 +5,7 @@ import chatbot from "../../assets/icons/chatbot.gif";
 import CardContainer from "../../components/CardContainer";
 import PackageCard from "../../components/PackageCard";
 import PackageDetailsPopupWindow from "../../components/PackageDetailsPopupWindow";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Example package data
 const packages = [
@@ -114,9 +115,13 @@ const packageTypes = [
 ];
 
 const ViewPackages = () => {
+	const { user } = useAuth();
 	const [selectedType, setSelectedType] = useState("All Packages");
 	const [popupOpen, setPopupOpen] = useState(false);
 	const [selectedPackage, setSelectedPackage] = useState(null);
+
+	// Get user role
+	const userRole = user?.userRole?.toLowerCase() || user?.role?.toLowerCase() || "staff";
 
 	// Filter packages based on dropdown selection
 	const filteredPackages =
@@ -145,7 +150,7 @@ const ViewPackages = () => {
 	return (
 		<div>
 			<div className="flex">
-				<Sidebar role="admin" />
+				<Sidebar />
 				<div className="flex-1 p-4 relative">
 					{/* Company Logo - top right */}
 					<img
@@ -198,7 +203,7 @@ const ViewPackages = () => {
 						isOpen={popupOpen}
 						onClose={() => setPopupOpen(false)}
 						packageData={selectedPackage ? getPopupData(selectedPackage) : null}
-						role="admin" // Add this line
+						role={userRole}
 					/>
 				</div>
 			</div>

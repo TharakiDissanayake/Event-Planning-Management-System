@@ -30,7 +30,7 @@ public class CustomerServiceIMPL implements CustomerService {
     }
 
     @Override
-    public CustomerDTO getCustomerById(int customerId) {
+    public CustomerDTO getCustomerById(String customerId) {
         if(customerRepository.existsById(customerId)){
             Customer customer = customerRepository.getReferenceById(customerId);
             CustomerDTO customerDTO = customerMapper.EntityToDTO(customer);
@@ -41,7 +41,7 @@ public class CustomerServiceIMPL implements CustomerService {
     }
 
     @Override
-    public String updateCustomer(RequestUpdateCustomerDTO requestUpdateCustomerDTO, int customerId) {
+    public String updateCustomer(RequestUpdateCustomerDTO requestUpdateCustomerDTO, String customerId) {
         if(customerRepository.existsById(customerId)){
             Customer customer = customerRepository.getReferenceById(customerId);
             customer.setCustomerEmail(requestUpdateCustomerDTO.getCustomerEmail());

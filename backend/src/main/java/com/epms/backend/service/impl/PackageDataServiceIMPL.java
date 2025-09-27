@@ -8,7 +8,7 @@ import com.epms.backend.entity.enums.PackageCategory;
 import com.epms.backend.exceptions.NotFoundException;
 import com.epms.backend.repository.PackageDataRepository;
 import com.epms.backend.service.PackageDataService;
-import com.epms.backend.util.mappaers.PackageDataMapper;
+import com.epms.backend.util.mappaers.PackageDataMapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +19,15 @@ public class PackageDataServiceIMPL implements PackageDataService {
     @Autowired
     private PackageDataRepository packageDataRepository;
     @Autowired
-    private PackageDataMapper packageDataMapper;
+    private PackageDataMapperImpl packageDataMapper;
 
     @Override
     public String savePackageData(RequestSavePackageDataDTO requestSavePackageDataDTO) {
         PackageData packageData = packageDataMapper.DTOToEntity(requestSavePackageDataDTO);
-        if(!packageDataRepository.existsById(packageData.getPackageId())){
-            packageDataRepository.save(packageData);
-            return "Package with name "+ packageData.getPackageName() + " saved sucessfully.";
-        }else {
-            throw new NotFoundException("Customer with ID "+ packageData.getPackageId() + " already exists.");
-        }
+        // For new packages, we don't need to check if ID exists since it's auto-generated
+        // We could check for duplicate package names instead
+        packageDataRepository.save(packageData);
+        return "Package with name "+ packageData.getPackageName() + " saved sucessfully.";
     }
 
     @Override
@@ -39,7 +37,7 @@ public class PackageDataServiceIMPL implements PackageDataService {
             packageData.setPackageCategory(requestUpdatePackageDataDTO.getPackageCategory());
             packageData.setCapacity(requestUpdatePackageDataDTO.getCapacity());
             packageData.setIncludes(requestUpdatePackageDataDTO.getIncludes());
-            packageData.setEventCategory(requestUpdatePackageDataDTO.getEventCategory());
+            packageData.setEventCategories(requestUpdatePackageDataDTO.getEventCategories());
             packageData.setPackagePrice(requestUpdatePackageDataDTO.getPackagePrice());
             packageData.setPackageStatus(requestUpdatePackageDataDTO.isPackageStatus());
             packageDataRepository.save(packageData);

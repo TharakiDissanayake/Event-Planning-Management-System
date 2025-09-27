@@ -1,37 +1,69 @@
 import React, { useState, useRef } from "react";
+import { customerService } from "../services/customerService";
+import { useAuth } from "../contexts/AuthContext";
 
 const AddCustomerForm = () => {
+    const { user } = useAuth();
     const fileInputRef = useRef(null);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
 
     const [formData, setFormData] = useState({
-        identitynumber: "",
-        name: "",
-        email: "",
-        contactnumber: "",
+        customerId: "",
+        customerName: "",
+        customerEmail: "",
+        contactNumber1: "",
+        contactNumber2: "",
         address: "",
     });
 
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [name]: files ? files[0] : value,
+            [name]: value,
         });
+        // Clear message when user starts typing
+        if (message.text) {
+            setMessage({ type: '', text: '' });
+        }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form Submitted:", formData);
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            const response = await customerService.createCustomer(formData);
+            setMessage({ 
+                type: 'success', 
+                text: 'Customer added successfully!' 
+            });
+            
+            // Reset form after successful submission
+            handleCancel();
+        } catch (error) {
+            console.error('Error creating customer:', error);
+            setMessage({ 
+                type: 'error', 
+                text: error.message || 'Failed to add customer. Please try again.' 
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleCancel = () => {
         setFormData({
-            identitynumber: "",
-            name: "",
-            email: "",
-            contactnumber: "",
+            customerId: "",
+            customerName: "",
+            customerEmail: "",
+            contactNumber1: "",
+            contactNumber2: "",
             address: "",
         });
+        setMessage({ type: '', text: '' });
 
         // Reset the file input using ref
         if (fileInputRef.current) {
@@ -43,30 +75,46 @@ const AddCustomerForm = () => {
         <div className="bg-white shadow-md p-8 w-[1200px]">
             <h2 className="text-3xl font-bold text-center mb-8">Customer Details</h2>
 
+            {/* Success/Error Message */}
+            {message.text && (
+                <div className={`mb-6 p-4 rounded-md text-center ${
+                    message.type === 'success' 
+                        ? 'bg-green-100 text-green-800 border border-green-300' 
+                        : 'bg-red-100 text-red-800 border border-red-300'
+                }`}>
+                    {message.text}
+                </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Package Name */}
+                {/* Customer ID */}
+                <div className="grid grid-cols-2 gap-4 items-center">
+                    <label className="text-lg font-semibold text-gray-700">
+                        Customer ID:
+                    </label>
+                    <input
+                        type="number"
+                        name="customerId"
+                        value={formData.customerId}
+                        onChange={handleChange}
+                        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        min="1"
+                        required
+                    />
+                </div>
+
+                {/* Customer Name */}
                 <div className="grid grid-cols-2 gap-4 items-center">
                     <label className="text-lg font-semibold text-gray-700">
                         Customer Name:
                     </label>
                     <input
                         type="text"
-                        name="identitynumber"
-                        value={formData.identitynumber}
+                        name="customerName"
+                        value={formData.customerName}
                         onChange={handleChange}
                         className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                    />
-                </div>
-
-                {/* Customer Name */}
-                <div className="grid grid-cols-2 gap-4 items-center">
-                    <label className="text-lg font-semibold text-gray-700">Customer Name:</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        required
                     />
                 </div>
 
@@ -75,26 +123,44 @@ const AddCustomerForm = () => {
                     <label className="text-lg font-semibold text-gray-700">Email:</label>
                     <input
                         type="email"
-                        name="email"
-                        value={formData.email}
+                        name="customerEmail"
+                        value={formData.customerEmail}
                         onChange={handleChange}
                         className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        required
                     />
                 </div>
 
-                {/* Contact Number */}
+                {/* Contact Number 1*/}
                 <div className="grid grid-cols-2 gap-4 items-center">
-                    <label className="text-lg font-semibold text-gray-700">Contact Number:</label>
+                    <label className="text-lg font-semibold text-gray-700">Contact Number 1:</label>
                     <input
-                        type="text"
-                        name="contactnumber"
-                        value={formData.contactnumber}
+                        type="tel"
+                        name="contactNumber1"
+                        value={formData.contactNumber1}
                         onChange={handleChange}
                         className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        pattern="[0-9]{10}"
+                        maxLength="10"
+                        required
+                    />
+                </div>
+                {/* Contact Number 2*/}
+                <div className="grid grid-cols-2 gap-4 items-center">
+                    <label className="text-lg font-semibold text-gray-700">Contact Number 2:</label>
+                    <input
+                        type="tel"
+                        name="contactNumber2"
+                        value={formData.contactNumber2}
+                        onChange={handleChange}
+                        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        pattern="[0-9]{10}"
+                        maxLength="10"
+                        required
                     />
                 </div>
 
-                {/* Includes */}
+                {/* Address */}
                 <div className="grid grid-cols-2 gap-4 items-center">
                     <label className="text-lg font-semibold text-gray-700">Address:</label>
                     <textarea
@@ -103,6 +169,7 @@ const AddCustomerForm = () => {
                         onChange={handleChange}
                         rows="3"
                         className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+                        required
                     />
                 </div>
 
@@ -111,15 +178,17 @@ const AddCustomerForm = () => {
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className="bg-gray-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-gray-600 transition"
+                        disabled={loading}
+                        className="bg-gray-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-gray-600 transition disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="bg-purple-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-purple-600 transition"
+                        disabled={loading}
+                        className="bg-purple-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-purple-600 transition disabled:opacity-50"
                     >
-                        Save 
+                        {loading ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </form>

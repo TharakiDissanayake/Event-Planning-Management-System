@@ -42,7 +42,7 @@ const ViewCalendar = () => {
     return (
         <div className="h-screen overflow-hidden">
             <div className="flex h-full">
-                <Sidebar role="admin" />
+                <Sidebar />
                 <div className="flex-1 p-4 relative flex flex-col">
                     {/* Company Logo - top right */}
                     <img
