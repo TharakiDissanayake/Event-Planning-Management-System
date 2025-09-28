@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 import UpdatePackageDetails from "./UpdatePackageDetails";
+import { packageService } from "../services/packageService";
 
-const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
+const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdate }) => {
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   if (!isOpen) return null;
 
@@ -15,11 +17,72 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
     setIsEditMode(false);
   };
 
-  const handleSave = (updatedData) => {
-    // Handle save logic here
-    console.log("Updated package data:", updatedData);
-    setIsEditMode(false);
-    // You can add API call here to save the data
+  const handleSave = async (updatedData) => {
+    try {
+      setIsUpdating(true);
+      console.log("Updating package data:", updatedData);
+      
+      // Map form data to API format
+      const updatePayload = {
+        packageName: updatedData.name,
+        packageCategory: updatedData.category,
+        packagePrice: parseInt(updatedData.price) || 0,
+        capacity: parseInt(updatedData.capacity) || 0,
+        includes: updatedData.includes,
+        packageStatus: updatedData.status === 'Active',
+        eventCategories: updatedData.eventCategories || [],
+        packageImage: null, // Will be set below
+      };
+
+      // Handle image
+      if (updatedData.newImageFile) {
+        // Upload new image first
+        try {
+          const imageResponse = await packageService.uploadImage(updatedData.newImageFile);
+          console.log('Image upload response:', imageResponse);
+          updatePayload.packageImage = imageResponse.filename; // Use uploaded filename (lowercase)
+        } catch (imageError) {
+          console.error('Image upload failed:', imageError);
+          alert('Image upload failed, but other details will be updated.');
+          // Keep current image if upload fails
+          if (updatedData.image && updatedData.image.includes('http://localhost:8082')) {
+            updatePayload.packageImage = updatedData.image.replace('http://localhost:8082', '');
+          } else {
+            updatePayload.packageImage = updatedData.image;
+          }
+        }
+      } else if (updatedData.image) {
+        // Keep existing image - extract filename from URL if needed
+        if (updatedData.image.includes('http://localhost:8082')) {
+          updatePayload.packageImage = updatedData.image.replace('http://localhost:8082', '');
+        } else {
+          updatePayload.packageImage = updatedData.image;
+        }
+      }
+
+      // Get package ID from packageData
+      const packageId = packageData?.id || packageData?.packageId;
+      if (!packageId) {
+        throw new Error('Package ID not found');
+      }
+
+      // Update package
+      await packageService.updatePackage(packageId, updatePayload);
+      
+      alert('Package updated successfully!');
+      setIsEditMode(false);
+      
+      // Refresh data if callback provided
+      if (onUpdate) {
+        onUpdate();
+      }
+      
+    } catch (error) {
+      console.error('Error updating package:', error);
+      alert('Failed to update package: ' + (error.message || 'Unknown error'));
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleDelete = () => {
@@ -40,6 +103,7 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
         onClose={handleCloseEdit}
         packageData={packageData}
         onSave={handleSave}
+        isLoading={isUpdating}
       />
     );
   }

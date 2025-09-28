@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 
-const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
+const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave, isLoading }) => {
   const [formData, setFormData] = useState({
     name: packageData?.name || "",
     category: packageData?.category || "",
     price: packageData?.price || "",
-    hall: packageData?.hall || "",
     capacity: packageData?.capacity || "",
     includes: packageData?.includes || "",
-    status: packageData?.status || "",
+    status: packageData?.status || "Active",
+    eventCategories: packageData?.eventCategories || [],
     image: packageData?.image || "",
+    newImageFile: null, // Track new image file
   });
 
   if (!isOpen) return null;
@@ -30,9 +31,31 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
       const imageURL = URL.createObjectURL(file);
       setFormData(prev => ({
         ...prev,
-        image: imageURL
+        image: imageURL,
+        newImageFile: file // Store the actual file for upload
       }));
     }
+  };
+
+  const handleEventCategoryChange = (category) => {
+    setFormData(prev => {
+      const currentCategories = prev.eventCategories || [];
+      const isSelected = currentCategories.includes(category);
+      
+      if (isSelected) {
+        // Remove category
+        return {
+          ...prev,
+          eventCategories: currentCategories.filter(cat => cat !== category)
+        };
+      } else {
+        // Add category
+        return {
+          ...prev,
+          eventCategories: [...currentCategories, category]
+        };
+      }
+    });
   };
 
   const handleSave = () => {
@@ -40,14 +63,15 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Blurred background overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-xs"></div>
-      <div className="relative bg-white rounded-xl shadow-lg w-[500px] h-[700px] p-8 border-6 border-secondary flex flex-col z-10">
+      <div className="relative bg-white rounded-xl shadow-lg w-[500px] max-h-[90vh] p-8 border-6 border-secondary flex flex-col z-10 overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
+          disabled={isLoading}
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-500 z-20 disabled:opacity-50"
         >
           <img
             src={closeIcon}
@@ -62,7 +86,7 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
         </h2>
 
         {/* Form */}
-        <div className="flex flex-col gap-5 text-lg flex-1">
+        <div className="flex flex-col gap-5 text-lg">
           {/* Package Name */}
           <div className="flex justify-between">
             <span className="font-semibold">Package Name:</span>
@@ -71,7 +95,8 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
+              disabled={isLoading}
+              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
           </div>
           
@@ -82,12 +107,12 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
+              disabled={isLoading}
+              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             >
-              <option value="Event Package">Event Package</option>
-              <option value="Wedding Package">Wedding Package</option>
-              <option value="Corporate Package">Corporate Package</option>
-              <option value="Birthday Package">Birthday Package</option>
+              <option value="PLATINAM">Platinum Package</option>
+              <option value="GOLD">Gold Package</option>
+              <option value="SILVER">Silver Package</option>
             </select>
           </div>
           
@@ -99,21 +124,9 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
               name="price"
               value={formData.price}
               onChange={handleInputChange}
+              disabled={isLoading}
               placeholder="e.g., $1000"
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          
-          {/* Hall */}
-          <div className="flex justify-between">
-            <span className="font-semibold">Hall:</span>
-            <input
-              type="text"
-              name="hall"
-              value={formData.hall}
-              onChange={handleInputChange}
-              placeholder="e.g., Grand Ballroom"
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
           </div>
           
@@ -125,8 +138,9 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
               name="capacity"
               value={formData.capacity}
               onChange={handleInputChange}
+              disabled={isLoading}
               placeholder="e.g., 100"
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
           </div>
           
@@ -137,8 +151,9 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
               name="includes"
               value={formData.includes}
               onChange={handleInputChange}
+              disabled={isLoading}
               placeholder="e.g., Decoration, Catering, Music"
-              className="border rounded px-2 py-1 w-48 h-16 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border rounded px-2 py-1 w-48 h-16 resize-none focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
           </div>
           
@@ -149,12 +164,41 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
               name="status"
               value={formData.status}
               onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
+              disabled={isLoading}
+              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             >
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
               <option value="Coming Soon">Coming Soon</option>
             </select>
+          </div>
+
+          {/* Event Categories */}
+          <div className="flex justify-between">
+            <span className="font-semibold">Event Categories:</span>
+            <div className="w-48 max-h-32 overflow-y-auto border rounded p-2">
+              {[
+                'WEDDING',
+                'ENGAGEMENT_PARTY', 
+                'BIRTHDAY_PARTY',
+                'ANNEVASARY_CELEBRATION',
+                'CORPARATE_MEETING',
+                'CONFERENCE_SEMINAR'
+              ].map((category) => (
+                <label key={category} className="flex items-center mb-1 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.eventCategories?.includes(category) || false}
+                    onChange={() => handleEventCategoryChange(category)}
+                    disabled={isLoading}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">
+                    {category.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
           
           {/* Image Upload */}
@@ -165,6 +209,7 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
+                disabled={isLoading}
                 className="hidden"
                 id="package-image-upload"
               />
@@ -177,17 +222,21 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
                   />
                   <label
                     htmlFor="package-image-upload"
-                    className="absolute inset-0 bg-white bg-opacity-50 text-black text-xs flex items-center justify-center rounded cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                    className={`absolute inset-0 bg-white bg-opacity-50 text-black text-xs flex items-center justify-center rounded cursor-pointer opacity-0 hover:opacity-100 transition-opacity ${
+                      isLoading ? 'cursor-not-allowed opacity-50' : ''
+                    }`}
                   >
-                    Change Image
+                    {isLoading ? 'Uploading...' : 'Change Image'}
                   </label>
                 </div>
               ) : (
                 <label
                   htmlFor="package-image-upload"
-                  className="block border rounded px-2 py-1 cursor-pointer hover:bg-gray-50 text-center text-sm"
+                  className={`block border rounded px-2 py-1 cursor-pointer hover:bg-gray-50 text-center text-sm ${
+                    isLoading ? 'cursor-not-allowed opacity-50 bg-gray-100' : ''
+                  }`}
                 >
-                  Choose Image
+                  {isLoading ? 'Loading...' : 'Choose Image'}
                 </label>
               )}
             </div>
@@ -198,15 +247,24 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave }) => {
         <div className="flex gap-4 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-gray-600 transition"
+            disabled={isLoading}
+            className="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition"
+            disabled={isLoading}
+            className="flex-1 bg-primary text-white py-3 rounded-xl font-semibold text-lg hover:bg-primary/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Updating...
+              </div>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         </div>
       </div>

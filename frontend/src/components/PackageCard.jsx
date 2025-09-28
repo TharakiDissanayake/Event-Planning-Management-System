@@ -1,6 +1,14 @@
 function PackageCard({ packageImage, packageName, packageDescription, packageStatus, onClick }) {
   // Construct full image URL if packageImage exists
-  const imageUrl = packageImage ? `http://localhost:8082${packageImage}` : null;
+  let imageUrl = null;
+  if (packageImage) {
+    // If packageImage already starts with /uploads/, use as is
+    if (packageImage.startsWith('/uploads/')) {
+      imageUrl = `http://localhost:8082${packageImage}`;
+    } else {
+      imageUrl = `http://localhost:8082/uploads/${packageImage}`;
+    }
+  }
   
   return (
     <div

@@ -117,9 +117,8 @@ export const packageService = {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
-          withCredentials: true,
+          withCredentials: false, // Don't send credentials for file upload
         }
       );
       return response.data;

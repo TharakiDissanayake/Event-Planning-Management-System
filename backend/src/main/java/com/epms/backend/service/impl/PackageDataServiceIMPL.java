@@ -34,12 +34,14 @@ public class PackageDataServiceIMPL implements PackageDataService {
     public String updatePackageData(int packageId, RequestUpdatePackageDataDTO requestUpdatePackageDataDTO) {
         if(packageDataRepository.existsById(packageId)){
             PackageData packageData = packageDataRepository.getReferenceById(packageId);
+            packageData.setPackageName(requestUpdatePackageDataDTO.getPackageName());
             packageData.setPackageCategory(requestUpdatePackageDataDTO.getPackageCategory());
             packageData.setCapacity(requestUpdatePackageDataDTO.getCapacity());
             packageData.setIncludes(requestUpdatePackageDataDTO.getIncludes());
             packageData.setEventCategories(requestUpdatePackageDataDTO.getEventCategories());
             packageData.setPackagePrice(requestUpdatePackageDataDTO.getPackagePrice());
             packageData.setPackageStatus(requestUpdatePackageDataDTO.isPackageStatus());
+            packageData.setPackageImage(requestUpdatePackageDataDTO.getPackageImage());
             packageDataRepository.save(packageData);
             return "Package with ID "+ packageId + " updated successfully.";
         }else {

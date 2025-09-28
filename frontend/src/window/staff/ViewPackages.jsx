@@ -74,6 +74,7 @@ const ViewPackages = () => {
 
 	// Map package data for popup (adjust as needed)
 	const getPopupData = (pkg) => ({
+		id: pkg.packageId || pkg.id,
 		name: pkg.packageName,
 		category: pkg.packageCategory || "Event Package",
 		price: pkg.packagePrice || "",
@@ -86,6 +87,12 @@ const ViewPackages = () => {
 		image: pkg.packageImage ? `http://localhost:8082${pkg.packageImage}` : null,
 		// Add more fields if needed
 	});
+
+	// Refresh packages after update
+	const handlePackageUpdate = () => {
+		fetchPackages();
+		setPopupOpen(false);
+	};
 
 	return (
 		<div>
@@ -211,6 +218,7 @@ const ViewPackages = () => {
 						onClose={() => setPopupOpen(false)}
 						packageData={selectedPackage ? getPopupData(selectedPackage) : null}
 						role={userRole}
+						onUpdate={handlePackageUpdate}
 					/>
 				</div>
 			</div>

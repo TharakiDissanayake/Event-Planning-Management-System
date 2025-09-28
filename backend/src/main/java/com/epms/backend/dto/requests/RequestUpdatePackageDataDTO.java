@@ -5,6 +5,7 @@ import com.epms.backend.entity.enums.PackageCategory;
 import java.util.List;
 
 public class RequestUpdatePackageDataDTO {
+    private String packageName;
     private PackageCategory packageCategory;
     private int capacity;
     private String includes;
@@ -15,7 +16,8 @@ public class RequestUpdatePackageDataDTO {
 
     public RequestUpdatePackageDataDTO() {}
 
-    public RequestUpdatePackageDataDTO(PackageCategory packageCategory, int capacity, String includes, List<EventCategory> eventCategories, int packagePrice, boolean packageStatus, String packageImage) {
+    public RequestUpdatePackageDataDTO(String packageName, PackageCategory packageCategory, int capacity, String includes, List<EventCategory> eventCategories, int packagePrice, boolean packageStatus, String packageImage) {
+        this.packageName = packageName;
         this.packageCategory = packageCategory;
         this.capacity = capacity;
         this.includes = includes;
@@ -23,6 +25,14 @@ public class RequestUpdatePackageDataDTO {
         this.packagePrice = packagePrice;
         this.packageStatus = packageStatus;
         this.packageImage = packageImage;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     public PackageCategory getPackageCategory() {
