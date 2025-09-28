@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../components/SideBar";
 import logo from "../../assets/icons/logo.png";
 import chatbot from "../../assets/icons/chatbot.gif";
@@ -6,128 +6,65 @@ import CardContainer from "../../components/CardContainer";
 import PackageCard from "../../components/PackageCard";
 import PackageDetailsPopupWindow from "../../components/PackageDetailsPopupWindow";
 import { useAuth } from "../../contexts/AuthContext";
-
-// Example package data
-const packages = [
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Silver+Package",
-		title: "Silver Package",
-		description:
-			"Basic event planning with venue, decoration, and catering for up to 100 guests.",
-		startDate: "2025-10-01",
-		endDate: "2025-12-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Gold+Package",
-		title: "Gold Package",
-		description:
-			"Includes premium decoration, live music, and photography for up to 200 guests.",
-		startDate: "2025-11-01",
-		endDate: "2026-01-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Platinum+Package",
-		title: "Platinum Package",
-		description:
-			"All-inclusive event planning with luxury services and custom themes for up to 500 guests.",
-		startDate: "2025-12-01",
-		endDate: "2026-03-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Silver+Package",
-		title: "Silver Package",
-		description:
-			"Basic event planning with venue, decoration, and catering for up to 100 guests.",
-		startDate: "2025-10-01",
-		endDate: "2025-12-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Gold+Package",
-		title: "Gold Package",
-		description:
-			"Includes premium decoration, live music, and photography for up to 200 guests.",
-		startDate: "2025-11-01",
-		endDate: "2026-01-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Platinum+Package",
-		title: "Platinum Package",
-		description:
-			"All-inclusive event planning with luxury services and custom themes for up to 500 guests.",
-		startDate: "2025-12-01",
-		endDate: "2026-03-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Silver+Package",
-		title: "Silver Package",
-		description:
-			"Basic event planning with venue, decoration, and catering for up to 100 guests.",
-		startDate: "2025-10-01",
-		endDate: "2025-12-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Gold+Package",
-		title: "Gold Package",
-		description:
-			"Includes premium decoration, live music, and photography for up to 200 guests.",
-		startDate: "2025-11-01",
-		endDate: "2026-01-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Platinum+Package",
-		title: "Platinum Package",
-		description:
-			"All-inclusive event planning with luxury services and custom themes for up to 500 guests.",
-		startDate: "2025-12-01",
-		endDate: "2026-03-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Silver+Package",
-		title: "Silver Package",
-		description:
-			"Basic event planning with venue, decoration, and catering for up to 100 guests.",
-		startDate: "2025-10-01",
-		endDate: "2025-12-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Gold+Package",
-		title: "Gold Package",
-		description:
-			"Includes premium decoration, live music, and photography for up to 200 guests.",
-		startDate: "2025-11-01",
-		endDate: "2026-01-31",
-	},
-	{
-		image: "https://via.placeholder.com/300x120.png?text=Platinum+Package",
-		title: "Platinum Package",
-		description:
-			"All-inclusive event planning with luxury services and custom themes for up to 500 guests.",
-		startDate: "2025-12-01",
-		endDate: "2026-03-31",
-	},
-];
-
-const packageTypes = [
-	"All Packages",
-	"Silver Package",
-	"Gold Package",
-	"Platinum Package",
-];
+import { packageService } from "../../services/packageService";
 
 const ViewPackages = () => {
 	const { user } = useAuth();
+	const [packages, setPackages] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [packageTypes, setPackageTypes] = useState(["All Packages"]);
+	const [packageCategories, setPackageCategories] = useState(["All Categories"]);
 	const [selectedType, setSelectedType] = useState("All Packages");
+	const [selectedCategory, setSelectedCategory] = useState("All Categories");
 	const [popupOpen, setPopupOpen] = useState(false);
 	const [selectedPackage, setSelectedPackage] = useState(null);
 
 	// Get user role
 	const userRole = user?.userRole?.toLowerCase() || user?.role?.toLowerCase() || "staff";
 
-	// Filter packages based on dropdown selection
-	const filteredPackages =
-		selectedType === "All Packages"
-			? packages
-			: packages.filter((pkg) => pkg.title === selectedType);
+	// Fetch packages from backend
+	const fetchPackages = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+			const response = await packageService.getAllPackages();
+			
+			// Extract packages from the nested response structure
+			const packagesData = response?.data || response;
+			
+			if (packagesData && Array.isArray(packagesData)) {
+				setPackages(packagesData);
+				
+				// Extract unique package names for the dropdown
+				const uniqueTypes = ["All Packages", ...new Set(packagesData.map(pkg => pkg.packageName))];
+				setPackageTypes(uniqueTypes);
+				
+				// Extract unique package categories for the dropdown
+				const uniqueCategories = ["All Categories", ...new Set(packagesData.map(pkg => pkg.packageCategory))];
+				setPackageCategories(uniqueCategories);
+			} else {
+				setPackages([]);
+			}
+		} catch (err) {
+			console.error('Error fetching packages:', err);
+			setError('Failed to load packages. Please try again.');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	// Fetch packages on component mount
+	useEffect(() => {
+		fetchPackages();
+	}, []);
+
+	// Filter packages based on dropdown selections
+	const filteredPackages = packages.filter(pkg => {
+		const matchesType = selectedType === "All Packages" || pkg.packageName === selectedType;
+		const matchesCategory = selectedCategory === "All Categories" || pkg.packageCategory === selectedCategory;
+		return matchesType && matchesCategory;
+	});
 
 	// Handle card click to open popup
 	const handleCardClick = (pkg) => {
@@ -137,13 +74,15 @@ const ViewPackages = () => {
 
 	// Map package data for popup (adjust as needed)
 	const getPopupData = (pkg) => ({
-		name: pkg.title,
-		category: "Event Package",
-		price: pkg.price || "",
+		name: pkg.packageName,
+		category: pkg.packageCategory || "Event Package",
+		price: pkg.packagePrice || "",
 		hall: pkg.hall || "",
 		capacity: pkg.capacity || "",
 		includes: pkg.includes || "",
-		status: pkg.status || "",
+		status: pkg.packageStatus || "",
+		description: pkg.includes || "",
+		eventCategories: pkg.eventCategories || "",
 		// Add more fields if needed
 	});
 
@@ -161,36 +100,103 @@ const ViewPackages = () => {
 					<h1 className="text-5xl font-bold text-primary mb-6 mt-10 ml-6 drop-shadow-lg">
 						Available Packages
 					</h1>
-					{/* Dropdown to select package type */}
-					<div className="mb-6 ml-6">
-						<label className="mr-3 font-semibold text-lg text-dark">Select Package:</label>
-						<select
-							className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-							value={selectedType}
-							onChange={(e) => setSelectedType(e.target.value)}
-						>
-							{packageTypes.map((type) => (
-								<option key={type} value={type}>
-									{type}
-								</option>
-							))}
-						</select>
+					{/* Filter dropdowns */}
+					<div className="mb-6 ml-6 flex gap-6 items-end">
+						{/* Package type filter */}
+						<div>
+							<label className="mr-3 font-semibold text-lg text-dark">Select Package:</label>
+							<select
+								className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+								value={selectedType}
+								onChange={(e) => setSelectedType(e.target.value)}
+							>
+								{packageTypes.map((type) => (
+									<option key={type} value={type}>
+										{type}
+									</option>
+								))}
+							</select>
+						</div>
+						{/* Package category filter */}
+						<div>
+							<label className="mr-3 font-semibold text-lg text-dark">Select Category:</label>
+							<select
+								className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+								value={selectedCategory}
+								onChange={(e) => setSelectedCategory(e.target.value)}
+							>
+								{packageCategories.map((category) => (
+									<option key={category} value={category}>
+										{category}
+									</option>
+								))}
+							</select>
+						</div>
+						{/* Clear filters button */}
+						{(selectedType !== "All Packages" || selectedCategory !== "All Categories") && (
+							<button
+								onClick={() => {
+									setSelectedType("All Packages");
+									setSelectedCategory("All Categories");
+								}}
+								className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+							>
+								Clear Filters
+							</button>
+						)}
 					</div>
 					{/* Card Container with filtered packages */}
 					<div>
-						<CardContainer>
-							{filteredPackages.map((pkg, idx) => (
-								<PackageCard
-									key={idx}
-									image={pkg.image}
-									title={pkg.title}
-									description={pkg.description}
-									startDate={pkg.startDate}
-									endDate={pkg.endDate}
-									onClick={() => handleCardClick(pkg)}
-								/>
-							))}
-						</CardContainer>
+						{loading && (
+							<div className="text-center py-8">
+								<div className="text-lg text-gray-600">Loading packages...</div>
+							</div>
+						)}
+						
+						{error && (
+							<div className="text-center py-8">
+								<div className="text-lg text-red-600 mb-4">{error}</div>
+								<button 
+									onClick={fetchPackages}
+									className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
+								>
+									Try Again
+								</button>
+							</div>
+						)}
+						
+						{!loading && !error && (
+							<CardContainer>
+								{filteredPackages.length > 0 ? (
+									filteredPackages.map((pkg, idx) => {
+										// Convert boolean status to readable text
+										const getStatusText = (status) => {
+											if (status === true || status === 'true') return 'Active';
+											if (status === false || status === 'false') return 'Inactive';
+											return status || 'Unknown';
+										};
+										
+										// Handle both possible field names for status
+										const statusValue = pkg.packageStatus !== undefined ? pkg.packageStatus : pkg.isPackageStatus;
+										
+										return (
+											<PackageCard
+												key={pkg.packageId || idx}
+												packageImage={pkg.packageImage}
+												packageName={pkg.packageName}
+												packageDescription={pkg.includes}
+												packageStatus={getStatusText(statusValue)}
+												onClick={() => handleCardClick(pkg)}
+											/>
+										);
+									})
+								) : (
+									<div className="col-span-full text-center py-8 text-gray-600">
+										No packages found.
+									</div>
+								)}
+							</CardContainer>
+						)}
 					</div>
 					{/* Chatbot icon at right bottom */}
 					<img
