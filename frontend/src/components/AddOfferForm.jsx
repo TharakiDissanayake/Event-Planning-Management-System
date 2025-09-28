@@ -14,6 +14,8 @@ const AddOfferForm = () => {
     offerStatus: true, // true for active, false for inactive
   });
 
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
 
@@ -37,12 +39,60 @@ const AddOfferForm = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size should be less than 10MB');
+        return;
+      }
+
+      setSelectedImage(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitMessage("");
 
     try {
+      let imageUrl = null;
+
+      // Upload image first if selected
+      if (selectedImage) {
+        const uploadResponse = await offerService.uploadImage(selectedImage);
+        if (uploadResponse.url) {
+          imageUrl = uploadResponse.url;
+        } else {
+          setSubmitMessage("Failed to upload image. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Prepare data for API call matching backend DTO structure
       const offerData = {
         offerName: formData.offerName,
@@ -52,6 +102,7 @@ const AddOfferForm = () => {
         packageCategories: formData.packageCategories,
         eventCategories: formData.eventCategories,
         offerDescription: formData.offerDescription,
+        offerImage: imageUrl,
         offerStatus: formData.offerStatus
       };
 
@@ -83,6 +134,8 @@ const AddOfferForm = () => {
       offerStatus: true,
     });
     setSubmitMessage("");
+    setSelectedImage(null);
+    setImagePreview(null);
 
     // Reset the file input using ref
     if (fileInputRef.current) {
@@ -228,6 +281,41 @@ const AddOfferForm = () => {
             rows="3"
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
           />
+        </div>
+
+        {/* Image Upload */}
+        <div className="grid grid-cols-2 gap-4 items-start">
+          <label className="text-lg font-semibold text-gray-700">
+            Offer Image (Optional):
+          </label>
+          <div className="space-y-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/*"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+            />
+            {imagePreview && (
+              <div className="relative inline-block">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded-lg border"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              Supported formats: JPG, PNG, GIF (Max size: 10MB)
+            </p>
+          </div>
         </div>
 
         {/* Status Dropdown */}

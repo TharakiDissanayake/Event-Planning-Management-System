@@ -14,13 +14,14 @@ public class RequestSavePackageDataDTO {
     private List<EventCategory> eventCategories = new ArrayList<>();
     private int packagePrice;
     private boolean packageStatus = true;
+    private String packageImage;
 
     // Constructors
     public RequestSavePackageDataDTO() {}
 
     public RequestSavePackageDataDTO(String packageName, PackageCategory packageCategory, 
                                    int capacity, String includes, List<EventCategory> eventCategories, 
-                                   int packagePrice, boolean packageStatus) {
+                                   int packagePrice, boolean packageStatus, String packageImage) {
         this.packageName = packageName;
         this.packageCategory = packageCategory;
         this.capacity = capacity;
@@ -28,6 +29,7 @@ public class RequestSavePackageDataDTO {
         this.eventCategories = eventCategories;
         this.packagePrice = packagePrice;
         this.packageStatus = packageStatus;
+        this.packageImage = packageImage;
     }
 
     // Getters and Setters
@@ -85,5 +87,13 @@ public class RequestSavePackageDataDTO {
 
     public void setPackageStatus(boolean packageStatus) {
         this.packageStatus = packageStatus;
+    }
+
+    public String getPackageImage() {
+        return packageImage;
+    }
+
+    public void setPackageImage(String packageImage) {
+        this.packageImage = packageImage;
     }
 }

@@ -15,13 +15,14 @@ public class PackageDataDTO {
     private List<EventCategory> eventCategories = new ArrayList<>();
     private int packagePrice;
     private boolean packageStatus;
+    private String packageImage;
 
     // Constructors
     public PackageDataDTO() {}
 
     public PackageDataDTO(int packageId, String packageName, PackageCategory packageCategory, 
                          int capacity, String includes, List<EventCategory> eventCategories, 
-                         int packagePrice, boolean packageStatus) {
+                         int packagePrice, boolean packageStatus, String packageImage) {
         this.packageId = packageId;
         this.packageName = packageName;
         this.packageCategory = packageCategory;
@@ -30,6 +31,7 @@ public class PackageDataDTO {
         this.eventCategories = eventCategories;
         this.packagePrice = packagePrice;
         this.packageStatus = packageStatus;
+        this.packageImage = packageImage;
     }
 
     // Getters and Setters
@@ -95,5 +97,13 @@ public class PackageDataDTO {
 
     public void setPackageStatus(boolean packageStatus) {
         this.packageStatus = packageStatus;
+    }
+
+    public String getPackageImage() {
+        return packageImage;
+    }
+
+    public void setPackageImage(String packageImage) {
+        this.packageImage = packageImage;
     }
 }

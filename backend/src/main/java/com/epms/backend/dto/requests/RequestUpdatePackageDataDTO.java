@@ -11,16 +11,18 @@ public class RequestUpdatePackageDataDTO {
     private List<EventCategory> eventCategories;
     private int packagePrice;
     private boolean packageStatus;
+    private String packageImage;
 
     public RequestUpdatePackageDataDTO() {}
 
-    public RequestUpdatePackageDataDTO(PackageCategory packageCategory, int capacity, String includes, List<EventCategory> eventCategories, int packagePrice, boolean packageStatus) {
+    public RequestUpdatePackageDataDTO(PackageCategory packageCategory, int capacity, String includes, List<EventCategory> eventCategories, int packagePrice, boolean packageStatus, String packageImage) {
         this.packageCategory = packageCategory;
         this.capacity = capacity;
         this.includes = includes;
         this.eventCategories = eventCategories;
         this.packagePrice = packagePrice;
         this.packageStatus = packageStatus;
+        this.packageImage = packageImage;
     }
 
     public PackageCategory getPackageCategory() {
@@ -69,5 +71,13 @@ public class RequestUpdatePackageDataDTO {
 
     public void setPackageStatus(boolean packageStatus) {
         this.packageStatus = packageStatus;
+    }
+
+    public String getPackageImage() {
+        return packageImage;
+    }
+
+    public void setPackageImage(String packageImage) {
+        this.packageImage = packageImage;
     }
 }

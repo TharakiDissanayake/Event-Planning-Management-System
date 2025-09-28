@@ -44,6 +44,9 @@ public class PackageData {
     @Column(name = "package_status", nullable = false)
     private boolean packageStatus = true;
 
+    @Column(name = "package_image", nullable = true)
+    private String packageImage; // Store image file path or URL
+
    public PackageData() {}
 
    public PackageData(int packageId, String packageName, PackageCategory packageCategory, int capacity, String includes, EventCategory eventCategory, int packagePrice, boolean packageStatus) {
@@ -119,5 +122,13 @@ public class PackageData {
 
    public void setPackageStatus(boolean packageStatus) {
        this.packageStatus = packageStatus;
+   }
+
+   public String getPackageImage() {
+       return packageImage;
+   }
+
+   public void setPackageImage(String packageImage) {
+       this.packageImage = packageImage;
    }
 }

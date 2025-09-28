@@ -22,6 +22,7 @@ public class RequestSaveOfferDTO {
     private List<PackageCategory> packageCategories = new ArrayList<>();
     private List<EventCategory> eventCategories = new ArrayList<>();
     private String offerDescription;
+    private String offerImage;
     private boolean offerStatus;
 
     // Getter methods
@@ -51,6 +52,10 @@ public class RequestSaveOfferDTO {
 
     public String getOfferDescription() {
         return offerDescription;
+    }
+
+    public String getOfferImage() {
+        return offerImage;
     }
 
     public boolean isOfferStatus() {
@@ -84,6 +89,10 @@ public class RequestSaveOfferDTO {
 
     public void setOfferDescription(String offerDescription) {
         this.offerDescription = offerDescription;
+    }
+
+    public void setOfferImage(String offerImage) {
+        this.offerImage = offerImage;
     }
 
     public void setOfferStatus(boolean offerStatus) {

@@ -27,6 +27,7 @@ public class OfferMapperIMPL implements OfferMapper{
         offer.setPackageCategories(requestSaveOfferDTO.getPackageCategories());
         offer.setEventCategories(requestSaveOfferDTO.getEventCategories());
         offer.setOfferDescription(requestSaveOfferDTO.getOfferDescription());
+        offer.setOfferImage(requestSaveOfferDTO.getOfferImage());
         offer.setOfferStatus(requestSaveOfferDTO.isOfferStatus());
 
         return offer;
@@ -48,6 +49,7 @@ public class OfferMapperIMPL implements OfferMapper{
         offerDTO.setPackageCategories(offer.getPackageCategories());
         offerDTO.setEventCategories(offer.getEventCategories());
         offerDTO.setOfferDescription(offer.getOfferDescription());
+        offerDTO.setOfferImage(offer.getOfferImage());
         offerDTO.setOfferStatus(offer.isOfferStatus());
         return offerDTO;
     }

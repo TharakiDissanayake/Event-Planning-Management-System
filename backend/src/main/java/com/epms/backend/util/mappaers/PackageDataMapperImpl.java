@@ -23,6 +23,7 @@ public class PackageDataMapperImpl implements PackageDataMapper {
         packageData.setEventCategories(requestSavePackageDataDTO.getEventCategories());
         packageData.setPackagePrice(requestSavePackageDataDTO.getPackagePrice());
         packageData.setPackageStatus(requestSavePackageDataDTO.isPackageStatus());
+        packageData.setPackageImage(requestSavePackageDataDTO.getPackageImage());
         
         return packageData;
     }
@@ -44,6 +45,7 @@ public class PackageDataMapperImpl implements PackageDataMapper {
         packageDataDTO.setEventCategories(packageData.getEventCategories());
         packageDataDTO.setPackagePrice(packageData.getPackagePrice());
         packageDataDTO.setPackageStatus(packageData.isPackageStatus());
+        packageDataDTO.setPackageImage(packageData.getPackageImage());
         
         return packageDataDTO;
     }

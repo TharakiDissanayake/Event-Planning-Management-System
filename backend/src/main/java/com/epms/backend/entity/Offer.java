@@ -48,6 +48,9 @@ public class Offer {
     @Column(name = "offer_description", nullable = false, columnDefinition = "TEXT")
     private String offerDescription;
 
+    @Column(name = "offer_image", nullable = true)
+    private String offerImage; // Store image file path or URL
+
     @Column(name = "offer_status", nullable = false)
     private boolean offerStatus;
 
@@ -82,6 +85,10 @@ public class Offer {
 
     public String getOfferDescription() {
         return offerDescription;
+    }
+
+    public String getOfferImage() {
+        return offerImage;
     }
 
     public boolean isOfferStatus() {
@@ -119,6 +126,10 @@ public class Offer {
 
     public void setOfferDescription(String offerDescription) {
         this.offerDescription = offerDescription;
+    }
+
+    public void setOfferImage(String offerImage) {
+        this.offerImage = offerImage;
     }
 
     public void setOfferStatus(boolean offerStatus) {

@@ -20,6 +20,9 @@ const AddPackageForm = () => {
     packageStatus: true, // Default to active
   });
 
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
   // Restore saved form data on mount
   useEffect(() => {
     const savedData = restoreFormData('packageForm');
@@ -77,6 +80,40 @@ const AddPackageForm = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setMessage({ type: 'error', text: 'Please select an image file' });
+        return;
+      }
+
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        setMessage({ type: 'error', text: 'File size should be less than 10MB' });
+        return;
+      }
+
+      setSelectedImage(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -93,6 +130,23 @@ const AddPackageForm = () => {
     }
 
     try {
+      let imageUrl = null;
+
+      // Upload image first if selected
+      if (selectedImage) {
+        const uploadResponse = await packageService.uploadImage(selectedImage);
+        if (uploadResponse.url) {
+          imageUrl = uploadResponse.url;
+        } else {
+          setMessage({ 
+            type: 'error', 
+            text: 'Failed to upload image. Please try again.' 
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       // Prepare data for API
       const packageData = {
         packageName: formData.packageName,
@@ -101,7 +155,8 @@ const AddPackageForm = () => {
         includes: formData.includes,
         eventCategories: formData.eventCategory, // Send full array of selected categories
         packagePrice: parseInt(formData.packagePrice),
-        packageStatus: formData.packageStatus
+        packageStatus: formData.packageStatus,
+        packageImage: imageUrl
       };
 
       const response = await packageService.createPackage(packageData);
@@ -137,6 +192,8 @@ const AddPackageForm = () => {
       packageStatus: true,
     });
     setMessage({ type: '', text: '' });
+    setSelectedImage(null);
+    setImagePreview(null);
 
     // Reset the file input using ref
     if (fileInputRef.current) {
@@ -261,6 +318,41 @@ const AddPackageForm = () => {
             min="0"
             required
           />
+        </div>
+
+        {/* Image Upload */}
+        <div className="grid grid-cols-2 gap-4 items-start">
+          <label className="text-lg font-semibold text-gray-700">
+            Package Image (Optional):
+          </label>
+          <div className="space-y-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/*"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+            />
+            {imagePreview && (
+              <div className="relative inline-block">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded-lg border"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              Supported formats: JPG, PNG, GIF (Max size: 10MB)
+            </p>
+          </div>
         </div>
 
         {/* Status Dropdown */}
