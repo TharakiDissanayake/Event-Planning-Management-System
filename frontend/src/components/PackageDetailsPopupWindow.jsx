@@ -45,14 +45,14 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Blurred background overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-xs"></div>
-      <div className="relative bg-white rounded-xl shadow-lg w-[500px] h-[700px] p-8 border-6 border-secondary flex flex-col z-10">
+      <div className="relative bg-white rounded-xl shadow-lg w-[500px] max-h-[90vh] p-8 border-6 border-secondary flex flex-col z-10 overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-500 z-20"
         >
           <img
             src={closeIcon}
@@ -67,7 +67,7 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
         </h2>
 
         {/* Details */}
-        <div className="flex flex-col gap-7 text-lg flex-1">
+        <div className="flex flex-col gap-7 text-lg">
           <div className="flex justify-between">
             <span className="font-semibold">Package Name:</span>
             <span className="border rounded px-2 py-1 w-48">{packageData?.name || "-"}</span>
@@ -81,10 +81,6 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
             <span className="border rounded px-2 py-1 w-48">{packageData?.price || "-"}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-semibold">Hall:</span>
-            <span className="border rounded px-2 py-1 w-48">{packageData?.hall || "-"}</span>
-          </div>
-          <div className="flex justify-between">
             <span className="font-semibold">Capacity:</span>
             <span className="border rounded px-2 py-1 w-48">{packageData?.capacity || "-"}</span>
           </div>
@@ -93,8 +89,39 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
             <span className="border rounded px-2 py-1 w-48">{packageData?.includes || "-"}</span>
           </div>
           <div className="flex justify-between">
+            <span className="font-semibold">Event Categories:</span>
+            <div className="w-48">
+              {packageData?.eventCategories && Array.isArray(packageData.eventCategories) && packageData.eventCategories.length > 0 ? (
+                <div className="flex flex-wrap gap-1 justify-end">
+                  {packageData.eventCategories.map((category, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="border rounded px-2 py-1 w-full text-center text-gray-500">No Categories</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between">
             <span className="font-semibold">Status:</span>
-            <span className="border rounded px-2 py-1 w-48">{packageData?.status || "-"}</span>
+            <div className="w-48 flex justify-end">
+              {packageData?.status ? (
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  packageData.status === 'Active' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {packageData.status}
+                </span>
+              ) : (
+                <span className="border rounded px-2 py-1 w-full text-center">-</span>
+              )}
+            </div>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Image:</span>
@@ -102,10 +129,18 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role }) => {
               <img
                 src={packageData.image}
                 alt="Package"
-                className="w-24 h-16 object-cover rounded"
+                className="w-32 h-24 object-cover rounded border"
+                onError={(e) => {
+                  console.log('Package popup image failed to load:', packageData.image);
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
               />
             ) : (
-              <span className="border rounded px-2 py-1 w-48">-</span>
+              <span className="border rounded px-2 py-1 w-48 text-center text-gray-500">No Image</span>
+            )}
+            {packageData?.image && (
+              <span className="border rounded px-2 py-1 w-48 text-center text-gray-500" style={{display: 'none'}}>Image not available</span>
             )}
           </div>
         </div>

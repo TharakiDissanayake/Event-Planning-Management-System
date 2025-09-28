@@ -80,9 +80,10 @@ const ViewPackages = () => {
 		hall: pkg.hall || "",
 		capacity: pkg.capacity || "",
 		includes: pkg.includes || "",
-		status: pkg.packageStatus || "",
+		status: pkg.packageStatus ? "Active" : "Inactive",
 		description: pkg.includes || "",
-		eventCategories: pkg.eventCategories || "",
+		eventCategories: pkg.eventCategories || [],
+		image: pkg.packageImage ? `http://localhost:8082${pkg.packageImage}` : null,
 		// Add more fields if needed
 	});
 

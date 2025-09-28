@@ -99,8 +99,10 @@ const ViewOffers = () => {
     description: offer.offerDescription,
     startDate: offer.formattedStartDate,
     endDate: offer.formattedEndDate,
+    packageCategories: offer.packageCategories || [],
+    eventCategories: offer.eventCategories || [],
     status: offer.offerStatus ? "Active" : "Inactive",
-    image: offer.offerImage,
+    image: offer.offerImage ? `http://localhost:8082${offer.offerImage}` : null,
   });
 
   // Clear search function

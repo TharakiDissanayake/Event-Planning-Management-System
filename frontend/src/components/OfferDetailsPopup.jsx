@@ -45,14 +45,14 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Blurred background overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-xs"></div>
-      <div className="relative bg-white rounded-xl shadow-lg w-[500px] h-[700px] p-8 border-6 border-secondary flex flex-col z-10">
+      <div className="relative bg-white rounded-xl shadow-lg w-[500px] max-h-[90vh] p-8 border-6 border-secondary flex flex-col z-10 overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-500 z-20"
         >
           <img
             src={closeIcon}
@@ -67,14 +67,10 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
         </h2>
 
         {/* Details */}
-        <div className="flex flex-col gap-7 text-lg flex-1">
+        <div className="flex flex-col gap-7 text-lg">
           <div className="flex justify-between">
             <span className="font-semibold">Offer Name:</span>
             <span className="border rounded px-2 py-1 w-48">{offerData?.name || "-"}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-semibold">Category:</span>
-            <span className="border rounded px-2 py-1 w-48">{offerData?.category || "-"}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Discount:</span>
@@ -89,8 +85,66 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
             <span className="border rounded px-2 py-1 w-48">{offerData?.endDate || "-"}</span>
           </div>
           <div className="flex justify-between">
+            <span className="font-semibold">Package Categories:</span>
+            <div className="w-48">
+              {offerData?.packageCategories && Array.isArray(offerData.packageCategories) && offerData.packageCategories.length > 0 ? (
+                <div className="flex flex-wrap gap-1 justify-end">
+                  {offerData.packageCategories.map((category, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="border rounded px-2 py-1 w-full text-center text-gray-500">No Categories</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">Event Categories:</span>
+            <div className="w-48">
+              {offerData?.eventCategories && Array.isArray(offerData.eventCategories) && offerData.eventCategories.length > 0 ? (
+                <div className="flex flex-wrap gap-1 justify-end">
+                  {offerData.eventCategories.map((category, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="border rounded px-2 py-1 w-full text-center text-gray-500">No Categories</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">Description:</span>
+            <div className="w-48">
+              <span className="border rounded px-2 py-1 w-full block text-sm max-h-20 overflow-y-auto">
+                {offerData?.description || "No description available"}
+              </span>
+            </div>
+          </div>
+          <div className="flex justify-between">
             <span className="font-semibold">Status:</span>
-            <span className="border rounded px-2 py-1 w-48">{offerData?.status || "-"}</span>
+            <div className="w-48 flex justify-end">
+              {offerData?.status ? (
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  offerData.status === 'Active' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {offerData.status}
+                </span>
+              ) : (
+                <span className="border rounded px-2 py-1 w-full text-center">-</span>
+              )}
+            </div>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Image:</span>
@@ -98,10 +152,18 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role }) => {
               <img
                 src={offerData.image}
                 alt="Offer"
-                className="w-24 h-16 object-cover rounded"
+                className="w-32 h-24 object-cover rounded border"
+                onError={(e) => {
+                  console.log('Offer popup image failed to load:', offerData.image);
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
               />
             ) : (
-              <span className="border rounded px-2 py-1 w-48">-</span>
+              <span className="border rounded px-2 py-1 w-48 text-center text-gray-500">No Image</span>
+            )}
+            {offerData?.image && (
+              <span className="border rounded px-2 py-1 w-48 text-center text-gray-500" style={{display: 'none'}}>Image not available</span>
             )}
           </div>
         </div>
