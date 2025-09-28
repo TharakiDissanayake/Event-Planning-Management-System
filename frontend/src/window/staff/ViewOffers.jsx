@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../components/SideBar";
 import logo from "../../assets/icons/logo.png";
 import chatbot from "../../assets/icons/chatbot.gif";
@@ -6,116 +6,84 @@ import CardContainer from "../../components/CardContainer";
 import OfferCard from "../../components/OfferCard";
 import OfferDetaiPopup from "../../components/OfferDetailsPopup";
 import { useAuth } from "../../contexts/AuthContext";
-
-// Example offer data
-const offers = [
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Silver+Offer",
-    title: "Silver Offer",
-    description: "Get 10% off on Silver Package bookings made before November 2025.",
-    startDate: "2025-09-15",
-    endDate: "2025-11-15",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Gold+Offer",
-    title: "Gold Offer",
-    description: "Free welcome drinks for all guests with Gold Package bookings.",
-    startDate: "2025-10-01",
-    endDate: "2025-12-31",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Platinum+Offer",
-    title: "Platinum Offer",
-    description: "Complimentary photography service with every Platinum Package.",
-    startDate: "2025-11-01",
-    endDate: "2026-01-31",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Silver+Offer",
-    title: "Silver Offer",
-    description: "Get 10% off on Silver Package bookings made before November 2025.",
-    startDate: "2025-09-15",
-    endDate: "2025-11-15",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Gold+Offer",
-    title: "Gold Offer",
-    description: "Free welcome drinks for all guests with Gold Package bookings.",
-    startDate: "2025-10-01",
-    endDate: "2025-12-31",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Platinum+Offer",
-    title: "Platinum Offer",
-    description: "Complimentary photography service with every Platinum Package.",
-    startDate: "2025-11-01",
-    endDate: "2026-01-31",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Silver+Offer",
-    title: "Silver Offer",
-    description: "Get 10% off on Silver Package bookings made before November 2025.",
-    startDate: "2025-09-15",
-    endDate: "2025-11-15",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Gold+Offer",
-    title: "Gold Offer",
-    description: "Free welcome drinks for all guests with Gold Package bookings.",
-    startDate: "2025-10-01",
-    endDate: "2025-12-31",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Platinum+Offer",
-    title: "Platinum Offer",
-    description: "Complimentary photography service with every Platinum Package.",
-    startDate: "2025-11-01",
-    endDate: "2026-01-31",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Silver+Offer",
-    title: "Silver Offer",
-    description: "Get 10% off on Silver Package bookings made before November 2025.",
-    startDate: "2025-09-15",
-    endDate: "2025-11-15",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Gold+Offer",
-    title: "Gold Offer",
-    description: "Free welcome drinks for all guests with Gold Package bookings.",
-    startDate: "2025-10-01",
-    endDate: "2025-12-31",
-  },
-  {
-    image: "https://via.placeholder.com/300x120.png?text=Platinum+Offer",
-    title: "Platinum Offer",
-    description: "Complimentary photography service with every Platinum Package.",
-    startDate: "2025-11-01",
-    endDate: "2026-01-31",
-  },
-];
-
-const offerTypes = [
-  "All Offers",
-  "Silver Offer",
-  "Gold Offer",
-  "Platinum Offer",
-];
+import offerService from "../../services/offerService";
 
 const ViewOffers = () => {
   const { user } = useAuth();
+  const [offers, setOffers] = useState([]);
+  const [filteredOffers, setFilteredOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedType, setSelectedType] = useState("All Offers");
+  const [searchTerm, setSearchTerm] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
 
   // Get user role
   const userRole = user?.userRole?.toLowerCase() || user?.role?.toLowerCase() || "staff";
 
-  // Filter offers based on dropdown selection
-  const filteredOffers =
-    selectedType === "All Offers"
-      ? offers
-      : offers.filter((offer) => offer.title === selectedType);
+  // Fetch offers from API
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching offers from API...");
+        const response = await offerService.getAllOffers();
+        console.log("Raw API response:", response);
+
+        if (response && response.data && Array.isArray(response.data)) {
+          // Map API response to component format
+          const mappedOffers = response.data.map((offer) => ({
+            ...offer,
+            // Format dates for display
+            formattedStartDate: offer.startDate ? new Date(offer.startDate).toLocaleDateString() : "",
+            formattedEndDate: offer.endDate ? new Date(offer.endDate).toLocaleDateString() : "",
+          }));
+          
+          console.log("Mapped offers:", mappedOffers);
+          setOffers(mappedOffers);
+          setFilteredOffers(mappedOffers);
+        } else {
+          console.warn("Invalid API response format:", response);
+          setError("Invalid data format received");
+          setOffers([]);
+          setFilteredOffers([]);
+        }
+      } catch (err) {
+        console.error("Error fetching offers:", err);
+        setError(err.response?.data?.message || err.message || "Failed to load offers");
+        setOffers([]);
+        setFilteredOffers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, []);
+
+  // Get unique offer types for dropdown
+  const offerTypes = ["All Offers", ...new Set(offers.map(offer => offer.offerName))];
+
+  // Filter offers based on search term and type
+  useEffect(() => {
+    let filtered = [...offers];
+
+    // Filter by search term (offer name)
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((offer) =>
+        offer.offerName?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by selected type
+    if (selectedType !== "All Offers") {
+      filtered = filtered.filter((offer) => offer.offerName === selectedType);
+    }
+
+    setFilteredOffers(filtered);
+  }, [offers, searchTerm, selectedType]);
 
   // Handle card click to open popup
   const handleCardClick = (offer) => {
@@ -125,15 +93,21 @@ const ViewOffers = () => {
 
   // Map offer data for popup
   const getPopupData = (offer) => ({
-    name: offer.title,
+    name: offer.offerName,
     category: "Event Offer",
-    discount: offer.discount || "10%",
-    description: offer.description,
-    startDate: offer.startDate,
-    endDate: offer.endDate,
-    status: offer.status || "Active",
-    image: offer.image,
+    discount: `${offer.offerDiscount}%`,
+    description: offer.offerDescription,
+    startDate: offer.formattedStartDate,
+    endDate: offer.formattedEndDate,
+    status: offer.offerStatus ? "Active" : "Inactive",
+    image: offer.offerImage,
   });
+
+  // Clear search function
+  const clearSearch = () => {
+    setSearchTerm("");
+    setSelectedType("All Offers");
+  };
 
 	return (
 		<div>
@@ -149,37 +123,90 @@ const ViewOffers = () => {
 					<h1 className="text-5xl font-bold text-primary mb-6 mt-10 ml-6 drop-shadow-lg">
 						Available Offers
 					</h1>
-					{/* Dropdown to select offer type */}
-					<div className="mb-6 ml-6">
-            <label className="mr-3 font-semibold text-lg text-dark">Select Offer:</label>
-            <select
-              className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            >
-              {offerTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-					{/* Card Container with filtered packages */}
-					<div>
-						<CardContainer>
-							{filteredOffers.map((offer, idx) => (
-								<OfferCard
-									key={idx}
-									image={offer.image}
-									title={offer.title}
-									description={offer.description}
-									startDate={offer.startDate}
-									endDate={offer.endDate}
-									onClick={() => handleCardClick(offer)}
+
+					{/* Search and filter controls */}
+					<div className="mb-6 ml-6 space-y-4">
+						{/* Search input */}
+						<div>
+							<label className="block font-semibold text-lg text-dark mb-2">Search Offers:</label>
+							<div className="flex gap-2 items-center">
+								<input
+									type="text"
+									placeholder="Search by offer name..."
+									className="border border-gray-300 rounded px-3 py-2 w-80 focus:outline-none focus:ring-2 focus:ring-primary"
+									value={searchTerm}
+									onChange={(e) => setSearchTerm(e.target.value)}
 								/>
-							))}
-						</CardContainer>
+								<button
+									onClick={clearSearch}
+									className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+								>
+									Clear Filters
+								</button>
+							</div>
+						</div>
+
+						{/* Dropdown to select offer type */}
+						<div>
+							<label className="block font-semibold text-lg text-dark mb-2">Filter by Offer Type:</label>
+							<select
+								className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+								value={selectedType}
+								onChange={(e) => setSelectedType(e.target.value)}
+							>
+								{offerTypes.map((type) => (
+									<option key={type} value={type}>
+										{type}
+									</option>
+								))}
+							</select>
+						</div>
 					</div>
+
+					{/* Loading state */}
+					{loading && (
+						<div className="text-center py-8">
+							<div className="text-lg">Loading offers...</div>
+						</div>
+					)}
+
+					{/* Error state */}
+					{error && (
+						<div className="text-center py-8">
+							<div className="text-red-600 text-lg mb-2">Error loading offers</div>
+							<div className="text-red-500">{error}</div>
+						</div>
+					)}
+
+					{/* No offers message */}
+					{!loading && !error && filteredOffers.length === 0 && (
+						<div className="text-center py-8">
+							<div className="text-gray-600 text-lg">
+								{offers.length === 0 ? "No offers available" : "No offers match your search criteria"}
+							</div>
+						</div>
+					)}
+
+					{/* Card Container with filtered offers */}
+					{!loading && !error && filteredOffers.length > 0 && (
+						<div>
+							<CardContainer>
+								{filteredOffers.map((offer, idx) => (
+									<OfferCard
+										key={offer.offerId || idx}
+										offerImage={offer.offerImage}
+										offerName={offer.offerName}
+										offerDescription={offer.offerDescription}
+										startDate={offer.formattedStartDate}
+										endDate={offer.formattedEndDate}
+										offerStatus={offer.offerStatus}
+										onClick={() => handleCardClick(offer)}
+									/>
+								))}
+							</CardContainer>
+						</div>
+					)}
+
 					{/* Chatbot icon at right bottom */}
 					<img
 						src={chatbot}

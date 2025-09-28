@@ -59,9 +59,13 @@ public class OfferMapperIMPL implements OfferMapper{
 
         responseGetAllOffers.setOfferId(offer.getOfferId());
         responseGetAllOffers.setOfferName(offer.getOfferName());
+        responseGetAllOffers.setStartDate(offer.getStartDate());
+        responseGetAllOffers.setEndDate(offer.getEndDate());
         responseGetAllOffers.setOfferDiscount(offer.getOfferDiscount());
         responseGetAllOffers.setPackageCategories(offer.getPackageCategories());
         responseGetAllOffers.setEventCategories(offer.getEventCategories());
+        responseGetAllOffers.setOfferDescription(offer.getOfferDescription());
+        responseGetAllOffers.setOfferImage(offer.getOfferImage());
         responseGetAllOffers.setOfferStatus(offer.isOfferStatus());
 
         return responseGetAllOffers;
