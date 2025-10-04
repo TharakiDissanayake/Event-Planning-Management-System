@@ -38,8 +38,33 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
+        // First try to get refresh token from localStorage
+        let refreshToken = localStorage.getItem('refreshToken');
+        
+        // If not in localStorage, check for httpOnly cookie refresh mechanism
+        if (!refreshToken) {
+          // The system is likely using httpOnly cookies, so call refresh without a token
+          try {
+            const response = await axios.post(
+              `${API_BASE_URL}/auth/refresh`,
+              {},
+              { withCredentials: true } // Important for cookies
+            );
+            
+            // Store new access token
+            const { accessToken } = response.data;
+            localStorage.setItem('accessToken', accessToken);
+            
+            // Update the original request with new token
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+            return api(originalRequest);
+          } catch (cookieRefreshError) {
+            console.error('Cookie-based refresh failed:', cookieRefreshError);
+            dispatchTokenExpired();
+            return Promise.reject(cookieRefreshError);
+          }
+        } else {
+          // Use the token-based refresh mechanism
           const response = await axios.post(
             `${API_BASE_URL}/auth/refresh`,
             { refreshToken },
@@ -54,6 +79,7 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
         // Refresh failed, redirect to login
         dispatchTokenExpired();
         return Promise.reject(refreshError);
@@ -101,7 +127,7 @@ const offerService = {
   // Update offer
   updateOffer: async (offerId, offerData) => {
     try {
-      const response = await api.put(`/v1/offer/update-package?id=${offerId}`, offerData);
+      const response = await api.put(`/v1/offer/update-offer?id=${offerId}`, offerData);
       return response.data;
     } catch (error) {
       console.error('Error updating offer:', error);
@@ -115,15 +141,20 @@ const offerService = {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await axios.post(
-        `${API_BASE_URL}/v1/files/upload`,
+      // Create a custom instance for file uploads with proper headers
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('Authentication token is missing');
+      }
+      
+      // Use the token refresh mechanism from the api instance
+      const response = await api.post(
+        `/v1/files/upload`,
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          withCredentials: true,
+          }
         }
       );
       return response.data;

@@ -2,16 +2,70 @@ import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 
 const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
+  // Pure string-based date formatter for YYYY-MM-DD or YYYY/MM/DD
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    // If format is 'YYYY-MM-DD HH:mm:ss.SSSSSS', extract the date part
+    const dateOnlyMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (dateOnlyMatch) {
+      return dateOnlyMatch[1];
+    }
+    // Accept YYYY-MM-DD or YYYY/MM/DD
+    const match = dateStr.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/);
+    if (match) {
+      // Always return as YYYY-MM-DD
+      return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+    // If not matched, try to extract numbers manually
+    const nums = dateStr.match(/\d+/g);
+    if (nums && nums.length >= 3) {
+      // MM/DD/YYYY format
+      if (nums[2].length === 4 && nums[0].length <= 2 && nums[1].length <= 2) {
+        return `${nums[2]}-${nums[0].padStart(2, '0')}-${nums[1].padStart(2, '0')}`;
+      }
+      // If string starts with year (4 digits), use that order
+      if (nums[0].length === 4) {
+        return `${nums[0]}-${nums[1].padStart(2, '0')}-${nums[2].padStart(2, '0')}`;
+      }
+      // Otherwise, fallback to year at the end (e.g. DD-MM-YYYY)
+      if (nums[2].length === 4) {
+        return `${nums[2]}-${nums[1].padStart(2, '0')}-${nums[0].padStart(2, '0')}`;
+      }
+    }
+    return "";
+  };
+
   const [formData, setFormData] = useState({
-    name: offerData?.name || "",
-    category: offerData?.category || "",
-    discount: offerData?.discount || "",
-    description: offerData?.description || "",
-    startDate: offerData?.startDate || "",
-    endDate: offerData?.endDate || "",
-    status: offerData?.status || "",
-    image: offerData?.image || "",
+  name: offerData?.name || "",
+  category: offerData?.category || "",
+  discount: offerData?.discount || "",
+  description: offerData?.description || "",
+  startDate: formatDate(offerData?.startDate),
+  endDate: formatDate(offerData?.endDate),
+  status: offerData?.status || "",
+  image: offerData?.image || "",
+  packageCategories: offerData?.packageCategories || [],
+  eventCategories: offerData?.eventCategories || [],
+  newImageFile: null,
   });
+
+  // Update formData when offerData changes
+  React.useEffect(() => {
+  console.log('Raw endDate value:', offerData?.endDate);
+    setFormData({
+      name: offerData?.name || "",
+      category: offerData?.category || "",
+      discount: offerData?.discount || "",
+      description: offerData?.description || "",
+      startDate: formatDate(offerData?.startDate),
+      endDate: formatDate(offerData?.endDate),
+      status: offerData?.status || "",
+      image: offerData?.image || "",
+      packageCategories: offerData?.packageCategories || [],
+      eventCategories: offerData?.eventCategories || [],
+      imageFile: null,
+    });
+  }, [offerData]);
 
   if (!isOpen) return null;
 
@@ -26,28 +80,67 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Create a URL for preview
       const imageURL = URL.createObjectURL(file);
       setFormData(prev => ({
         ...prev,
-        image: imageURL
+        image: imageURL,
+        newImageFile: file // Store the actual file for upload
       }));
     }
   };
+  // Checkbox change handler for categories
+  const handleChange = (e) => {
+    const { name, value, checked } = e.target;
+    setFormData(prev => {
+      const arr = Array.isArray(prev[name]) ? prev[name] : [];
+      if (checked) {
+        return { ...prev, [name]: [...arr, value] };
+      } else {
+        return { ...prev, [name]: arr.filter((v) => v !== value) };
+      }
+    });
+  };
 
+  // Handle save: prepare data for update and pass to parent
   const handleSave = () => {
-    onSave(formData);
+    const payload = {
+      name: formData.name,
+      discount: formData.discount,
+      description: formData.description,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      packageCategories: formData.packageCategories,
+      eventCategories: formData.eventCategories,
+      status: formData.status,
+      image: formData.image,
+      imageFile: formData.newImageFile // Pass the file for upload in parent component
+    };
+    
+    // Validate required fields
+    if (!payload.name || !payload.discount || !payload.description || 
+        !payload.startDate || !payload.endDate || !payload.status) {
+      alert("Please fill in all required fields");
+      return;
+    }
+    
+    // Validate at least one category selected
+    if (payload.packageCategories.length === 0 || payload.eventCategories.length === 0) {
+      alert("Please select at least one package category and one event category");
+      return;
+    }
+    
+    onSave(payload);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Blurred background overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-xs"></div>
-      <div className="relative bg-white rounded-xl shadow-lg w-[500px] h-[700px] p-8 border-6 border-secondary flex flex-col z-10">
+      <div className="relative bg-white rounded-xl shadow-lg w-[500px] max-h-[90vh] p-8 border-6 border-secondary flex flex-col z-10 overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-500 z-20"
         >
           <img
             src={closeIcon}
@@ -74,23 +167,7 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
               className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          
-          {/* Category */}
-          <div className="flex justify-between">
-            <span className="font-semibold">Category:</span>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="Event Offer">Event Offer</option>
-              <option value="Package Offer">Package Offer</option>
-              <option value="Seasonal Offer">Seasonal Offer</option>
-              <option value="Limited Time Offer">Limited Time Offer</option>
-            </select>
-          </div>
-          
+
           {/* Discount */}
           <div className="flex justify-between">
             <span className="font-semibold">Discount:</span>
@@ -103,19 +180,7 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
               className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          
-          {/* Description
-          <div className="flex justify-between">
-            <span className="font-semibold">Description:</span>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Offer description..."
-              className="border rounded px-2 py-1 w-48 h-16 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div> */}
-          
+
           {/* Start Date */}
           <div className="flex justify-between">
             <span className="font-semibold">Start Date:</span>
@@ -127,7 +192,7 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
               className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          
+
           {/* End Date */}
           <div className="flex justify-between">
             <span className="font-semibold">End Date:</span>
@@ -139,7 +204,76 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
               className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          
+
+          {/* Package Category */}
+          <div className="grid grid-cols-2 gap-4 items-center">
+            <label className="text-lg font-semibold text-gray-700">Package Category:</label>
+            <div className="space-y-2">
+              {[
+                { value: "PLATINAM", label: "Platinum" },
+                { value: "GOLD", label: "Gold" },
+                { value: "SILVER", label: "Silver" }
+              ].map((packageType) => (
+                <label key={packageType.value} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    name="packageCategories"
+                    value={packageType.value}
+                    checked={formData.packageCategories.includes(packageType.value)}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                  />
+                  <span className="text-sm text-gray-700">{packageType.label}</span>
+                </label>
+              ))}
+              {formData.packageCategories.length === 0 && (
+                <p className="text-sm text-red-500 mt-1">Please select at least one package type</p>
+              )}
+            </div>
+          </div>
+
+          {/* Event Category */}
+          <div className="grid grid-cols-2 gap-4 items-center">
+            <label className="text-lg font-semibold text-gray-700">Event Category:</label>
+            <div className="space-y-2">
+              {[
+                { value: "WEDDING", label: "Wedding" },
+                { value: "ENGAGEMENT_PARTY", label: "Engagement Party" },
+                { value: "BIRTHDAY_PARTY", label: "Birthday Party" },
+                { value: "ANNEVASARY_CELEBRATION", label: "Anniversary Celebration" },
+                { value: "CORPARATE_MEETING", label: "Corporate Meeting" },
+                { value: "CONFERENCE_SEMINAR", label: "Conference/Seminar" }
+              ].map((eventType) => (
+                <label key={eventType.value} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    name="eventCategories"
+                    value={eventType.value}
+                    checked={formData.eventCategories.includes(eventType.value)}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                  />
+                  <span className="text-sm text-gray-700">{eventType.label}</span>
+                </label>
+              ))}
+              {formData.eventCategories.length === 0 && (
+                <p className="text-sm text-red-500 mt-1">Please select at least one event type</p>
+              )}
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="flex justify-between">
+            <span className="font-semibold">Description:</span>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Offer description..."
+              className="border rounded px-2 py-1 w-48 h-16 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
           {/* Status */}
           <div className="flex justify-between">
             <span className="font-semibold">Status:</span>
@@ -155,7 +289,28 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
               <option value="Coming Soon">Coming Soon</option>
             </select>
           </div>
-          
+
+          {/* Image Upload
+          <div className="flex flex-col gap-2">
+            <span className="font-semibold">Image:</span>
+            <div className="flex gap-4 items-center">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                id="offer-image-upload"
+                className="block"
+              />
+              {formData.image && (
+                <img
+                  src={formData.image}
+                  alt="Offer Preview"
+                  className="w-24 h-16 object-cover rounded border"
+                />
+              )}
+            </div>
+          </div> */}
+
           {/* Image Upload */}
           <div className="flex justify-between items-center">
             <span className="font-semibold">Image:</span>
@@ -192,7 +347,7 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
             </div>
           </div>
         </div>
-        
+
         {/* Save and Cancel Buttons */}
         <div className="flex gap-4 mt-6">
           <button

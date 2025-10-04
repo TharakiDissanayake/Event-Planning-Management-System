@@ -32,7 +32,7 @@ public class OfferController {
     }
 
     @PutMapping(
-            path = {"update-package"},
+            path = {"update-offer"},
             params = "id"
     )
     public ResponseEntity<StandardResponse> updateOffer(@RequestParam(value = "id") int offerId, @RequestBody RequestUpdateOfferDTO requestUpdateOfferDTO){

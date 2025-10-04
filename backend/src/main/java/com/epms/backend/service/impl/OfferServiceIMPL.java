@@ -38,12 +38,24 @@ public class OfferServiceIMPL implements OfferService {
     public String updateOffer(int offerId, RequestUpdateOfferDTO requestUpdateOfferDTO) {
         if(offerRepository.existsById(offerId)){
             Offer offer = offerRepository.getReferenceById(offerId);
+            
+            // Update all fields from the DTO
+            if (requestUpdateOfferDTO.getOfferName() != null) {
+                offer.setOfferName(requestUpdateOfferDTO.getOfferName());
+            }
             offer.setOfferDiscount(requestUpdateOfferDTO.getOfferDiscount());
             offer.setStartDate(requestUpdateOfferDTO.getStartDate());
             offer.setEndDate(requestUpdateOfferDTO.getEndDate());
             offer.setPackageCategories(requestUpdateOfferDTO.getPackageCategories());
             offer.setEventCategories(requestUpdateOfferDTO.getEventCategories());
             offer.setOfferDescription(requestUpdateOfferDTO.getOfferDescription());
+            offer.setOfferStatus(requestUpdateOfferDTO.isOfferStatus()); // Added status update
+            
+            // Update image if provided
+            if (requestUpdateOfferDTO.getOfferImage() != null && !requestUpdateOfferDTO.getOfferImage().isEmpty()) {
+                offer.setOfferImage(requestUpdateOfferDTO.getOfferImage());
+            }
+            
             offerRepository.save(offer);
             return "Offer with ID "+ offerId + " updated successfully.";
         }else {

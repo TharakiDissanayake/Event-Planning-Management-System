@@ -1,6 +1,30 @@
 function OfferCard({ offerImage, offerName, offerDescription, startDate, endDate, offerStatus, onClick }) {
   // Construct full image URL if offerImage exists
-  const imageUrl = offerImage ? `http://localhost:8082${offerImage}` : null;
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    
+    // If it already starts with http://, use as is
+    if (imagePath.startsWith('http://')) {
+      return imagePath;
+    }
+    
+    // If it starts with /uploads/, add the base URL
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:8082${imagePath}`;
+    }
+    
+    // Otherwise, assume it needs the full path with /uploads/
+    if (!imagePath.includes('/uploads/')) {
+      return `http://localhost:8082/uploads/${imagePath}`;
+    }
+    
+    // Default case, just add the base URL
+    return `http://localhost:8082${imagePath}`;
+  };
+  
+  const imageUrl = getImageUrl(offerImage);
+  console.log('Image path in card:', offerImage);
+  console.log('Constructed image URL:', imageUrl);
   
   return (
     <div
@@ -13,8 +37,10 @@ function OfferCard({ offerImage, offerName, offerDescription, startDate, endDate
           src={imageUrl}
           alt={offerName}
           className="w-full h-30 object-cover rounded-xl"
+          onLoad={() => console.log('Image loaded successfully:', imageUrl)}
           onError={(e) => {
             console.log('Image failed to load:', imageUrl);
+            console.log('Original image path:', offerImage);
             e.target.style.display = 'none';
           }}
         />

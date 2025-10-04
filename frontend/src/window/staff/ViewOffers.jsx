@@ -22,44 +22,48 @@ const ViewOffers = () => {
   // Get user role
   const userRole = user?.userRole?.toLowerCase() || user?.role?.toLowerCase() || "staff";
 
-  // Fetch offers from API
-  useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log("Fetching offers from API...");
-        const response = await offerService.getAllOffers();
-        console.log("Raw API response:", response);
+  // Define fetchOffers function outside useEffect so it can be reused
+  const fetchOffers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log("Fetching offers from API...");
+      const response = await offerService.getAllOffers();
+      console.log("Raw API response:", response);
 
-        if (response && response.data && Array.isArray(response.data)) {
-          // Map API response to component format
-          const mappedOffers = response.data.map((offer) => ({
+      if (response && response.data && Array.isArray(response.data)) {
+        // Map API response to component format
+        const mappedOffers = response.data.map((offer) => {
+          console.log('Raw offer from API:', offer);
+          return {
             ...offer,
             // Format dates for display
             formattedStartDate: offer.startDate ? new Date(offer.startDate).toLocaleDateString() : "",
             formattedEndDate: offer.endDate ? new Date(offer.endDate).toLocaleDateString() : "",
-          }));
-          
-          console.log("Mapped offers:", mappedOffers);
-          setOffers(mappedOffers);
-          setFilteredOffers(mappedOffers);
-        } else {
-          console.warn("Invalid API response format:", response);
-          setError("Invalid data format received");
-          setOffers([]);
-          setFilteredOffers([]);
-        }
-      } catch (err) {
-        console.error("Error fetching offers:", err);
-        setError(err.response?.data?.message || err.message || "Failed to load offers");
+          };
+        });
+        
+        console.log("Mapped offers:", mappedOffers);
+        setOffers(mappedOffers);
+        setFilteredOffers(mappedOffers);
+      } else {
+        console.warn("Invalid API response format:", response);
+        setError("Invalid data format received");
         setOffers([]);
         setFilteredOffers([]);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching offers:", err);
+      setError(err.response?.data?.message || err.message || "Failed to load offers");
+      setOffers([]);
+      setFilteredOffers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Fetch offers from API
+  useEffect(() => {
     fetchOffers();
   }, []);
 
@@ -85,6 +89,29 @@ const ViewOffers = () => {
     setFilteredOffers(filtered);
   }, [offers, searchTerm, selectedType]);
 
+  // Helper function to get complete image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    
+    // If it already starts with http://, use as is
+    if (imagePath.startsWith('http://')) {
+      return imagePath;
+    }
+    
+    // If it starts with /uploads/, add the base URL
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:8082${imagePath}`;
+    }
+    
+    // Otherwise, assume it needs the full path with /uploads/
+    if (!imagePath.includes('/uploads/')) {
+      return `http://localhost:8082/uploads/${imagePath}`;
+    }
+    
+    // Default case, just add the base URL
+    return `http://localhost:8082${imagePath}`;
+  };
+
   // Handle card click to open popup
   const handleCardClick = (offer) => {
     setSelectedOffer(offer);
@@ -92,18 +119,24 @@ const ViewOffers = () => {
   };
 
   // Map offer data for popup
-  const getPopupData = (offer) => ({
-    name: offer.offerName,
-    category: "Event Offer",
-    discount: `${offer.offerDiscount}%`,
-    description: offer.offerDescription,
-    startDate: offer.formattedStartDate,
-    endDate: offer.formattedEndDate,
-    packageCategories: offer.packageCategories || [],
-    eventCategories: offer.eventCategories || [],
-    status: offer.offerStatus ? "Active" : "Inactive",
-    image: offer.offerImage ? `http://localhost:8082${offer.offerImage}` : null,
-  });
+  const getPopupData = (offer) => {
+    const imageUrl = offer.offerImage ? getImageUrl(offer.offerImage) : null;
+    console.log('Image URL for popup:', imageUrl);
+    
+    return {
+      id: offer.offerId, // Pass the ID for update operations
+      name: offer.offerName,
+      category: "Event Offer",
+      discount: `${offer.offerDiscount}%`,
+      description: offer.offerDescription,
+      startDate: offer.formattedStartDate,
+      endDate: offer.formattedEndDate,
+      packageCategories: offer.packageCategories || [],
+      eventCategories: offer.eventCategories || [],
+      status: offer.offerStatus ? "Active" : "Inactive",
+      image: imageUrl,
+    };
+  };
 
   // Clear search function
   const clearSearch = () => {
@@ -218,9 +251,13 @@ const ViewOffers = () => {
 					{/* Popup Window */}
 					<OfferDetaiPopup
 						isOpen={popupOpen}
-						onClose={() => setPopupOpen(false)}
+						onClose={() => {
+							setPopupOpen(false);
+							setSelectedOffer(null);
+						}}
 						offerData={selectedOffer ? getPopupData(selectedOffer) : null}
 						role={userRole}
+						onUpdate={() => fetchOffers()}
 					/>
 				</div>
 			</div>

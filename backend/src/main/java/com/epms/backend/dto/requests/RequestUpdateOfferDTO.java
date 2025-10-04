@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class RequestUpdateOfferDTO {
+    private String offerName;
     private int offerDiscount;
     private Date startDate;
     private Date endDate;
@@ -21,8 +22,13 @@ public class RequestUpdateOfferDTO {
     private List<EventCategory> eventCategories;
     private String offerDescription;
     private boolean offerStatus;
+    private String offerImage;
 
     // Getter methods
+    public String getOfferName() {
+        return offerName;
+    }
+    
     public int getOfferDiscount() {
         return offerDiscount;
     }
@@ -50,8 +56,16 @@ public class RequestUpdateOfferDTO {
     public boolean isOfferStatus() {
         return offerStatus;
     }
+    
+    public String getOfferImage() {
+        return offerImage;
+    }
 
     // Setter methods
+    public void setOfferName(String offerName) {
+        this.offerName = offerName;
+    }
+    
     public void setOfferDiscount(int offerDiscount) {
         this.offerDiscount = offerDiscount;
     }
@@ -78,5 +92,9 @@ public class RequestUpdateOfferDTO {
 
     public void setOfferStatus(boolean offerStatus) {
         this.offerStatus = offerStatus;
+    }
+    
+    public void setOfferImage(String offerImage) {
+        this.offerImage = offerImage;
     }
 }

@@ -85,13 +85,29 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this package?")) {
-      // Handle delete logic here
-      console.log("Deleting package:", packageData);
-      // Add API call here to delete the package
-      alert("Package deleted successfully!");
-      onClose(); // Close the popup after deletion
+      try {
+        const packageId = packageData?.id || packageData?.packageId;
+        if (!packageId) {
+          throw new Error('Package ID not found');
+        }
+        
+        console.log("Deleting package:", packageData);
+        await packageService.deletePackage(packageId);
+        
+        alert("Package deleted successfully!");
+        
+        // Refresh data if callback provided
+        if (onUpdate) {
+          onUpdate();
+        }
+        
+        onClose(); // Close the popup after deletion
+      } catch (error) {
+        console.error('Error deleting package:', error);
+        alert('Failed to delete package: ' + (error.message || 'Unknown error'));
+      }
     }
   };
 
