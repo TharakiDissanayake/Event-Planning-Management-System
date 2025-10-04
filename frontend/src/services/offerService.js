@@ -174,6 +174,35 @@ const offerService = {
       throw error;
     }
   },
+  
+  // Get offers by event category, package category, and event date
+  getOffersByCategories: async (eventCategory, packageCategory, eventDate) => {
+    try {
+      console.log(`Fetching offers for event category: ${eventCategory}, package category: ${packageCategory}, event date: ${eventDate}`);
+      
+      // Build the URL with query parameters
+      let url = `/v1/offer/get-offers-by-categories?eventCategory=${eventCategory}&packageCategory=${packageCategory}`;
+      if (eventDate) {
+        url += `&eventDate=${eventDate}`;
+      }
+      
+      const response = await api.get(url);
+      console.log('Offers response:', response);
+      
+      if (response && response.data && response.data.data) {
+        console.log(`Found ${response.data.data.length} active offers matching criteria`);
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching offers by categories:', error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
+      throw error;
+    }
+  },
 };
 
 export default offerService;

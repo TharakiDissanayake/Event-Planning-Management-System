@@ -10,7 +10,11 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
     
     // Calculate discount amount (assuming discount is in percentage)
     const discountAmount = (packagePrice * offerDiscount) / 100;
-    const finalPrice = packagePrice - discountAmount;
+    
+    // If finalPrice is directly provided, use it; otherwise calculate
+    const finalPrice = eventData.finalPrice !== undefined 
+        ? parseFloat(eventData.finalPrice) 
+        : packagePrice - discountAmount;
     
     return {
       packagePrice,
@@ -56,15 +60,15 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
         {/* Quotation Details */}
         <div className="flex-1 space-y-6">
           <div className="border-b pb-4">
-            <h3 className="text-xl font-semibold mb-4">Event Information</h3>
+            <h3 className="text-xl font-semibold mb-4">Customer & Event Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <span className="font-semibold">Identity Number:</span>
                 <p className="text-gray-700">{eventData.identityNumber}</p>
               </div>
               <div>
-                <span className="font-semibold">Event Name:</span>
-                <p className="text-gray-700">{eventData.eventName}</p>
+                <span className="font-semibold">Customer Name:</span>
+                <p className="text-gray-700">{eventData.customerName || "Not provided"}</p>
               </div>
               <div>
                 <span className="font-semibold">Event Type:</span>
@@ -81,8 +85,16 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
             <h3 className="text-xl font-semibold mb-4">Pricing Details</h3>
             <div className="space-y-3">
               <div className="flex justify-between">
+                <span className="font-medium">Package Name:</span>
+                <span className="text-lg">{eventData.packageName || "Not specified"}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="font-medium">Package Price:</span>
                 <span className="text-lg">${totals.packagePrice.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Offer Name:</span>
+                <span className="text-lg">{eventData.offerName || "No offer"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Offer Discount:</span>

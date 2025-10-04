@@ -64,4 +64,26 @@ public class OfferController {
         OfferDTO offerDTO = offerService.getOfferById(offerId);
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "SUCCESS", offerDTO), HttpStatus.OK);
     }
+    
+    /**
+     * Get all active offers filtered by event category, package category, and event date
+     * Only returns offers that are active and valid for the event date
+     */
+    @GetMapping(
+            path = {"get-offers-by-categories"},
+            params = {"eventCategory", "packageCategory", "eventDate"}
+    )
+    public ResponseEntity<StandardResponse> getOffersByCategories(
+            @RequestParam(value = "eventCategory") String eventCategory,
+            @RequestParam(value = "packageCategory") String packageCategory,
+            @RequestParam(value = "eventDate", required = false) String eventDate){
+        System.out.println("Received request for offers - Event Category: " + eventCategory + 
+                         ", Package Category: " + packageCategory + 
+                         ", Event Date: " + eventDate);
+        
+        List<ResponseGetAllOffers> offers = offerService.getOffersByCategories(eventCategory, packageCategory, eventDate);
+        
+        System.out.println("Returning " + offers.size() + " active offers for the specified criteria");
+        return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", offers), HttpStatus.OK);
+    }
 }

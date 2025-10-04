@@ -17,4 +17,6 @@ public interface OfferService {
     String deleteOfferById(int offerId);
 
     OfferDTO getOfferById(int offerId);
+    
+    List<ResponseGetAllOffers> getOffersByCategories(String eventCategory, String packageCategory, String eventDate);
 }

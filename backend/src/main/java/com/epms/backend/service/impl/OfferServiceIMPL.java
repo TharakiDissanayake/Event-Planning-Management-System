@@ -94,4 +94,77 @@ public class OfferServiceIMPL implements OfferService {
             throw new NotFoundException("Offer with ID "+ offerId + " Not found.");
         }
     }
+    
+    @Override
+    public List<ResponseGetAllOffers> getOffersByCategories(String eventCategory, String packageCategory, String eventDateStr) {
+        try {
+            // Convert string to enum for proper comparison
+            com.epms.backend.entity.enums.EventCategory eventCategoryEnum = 
+                com.epms.backend.entity.enums.EventCategory.valueOf(eventCategory);
+            com.epms.backend.entity.enums.PackageCategory packageCategoryEnum = 
+                com.epms.backend.entity.enums.PackageCategory.valueOf(packageCategory);
+                
+            // Parse event date if provided
+            java.util.Date eventDate = null;
+            if (eventDateStr != null && !eventDateStr.isEmpty()) {
+                try {
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    eventDate = dateFormat.parse(eventDateStr);
+                    System.out.println("Parsed event date: " + eventDate);
+                } catch (java.text.ParseException e) {
+                    System.out.println("Error parsing event date: " + e.getMessage());
+                    // Continue with null event date (won't filter by date)
+                }
+            }
+            
+            // Log search criteria
+            System.out.println("Searching for offers with event category: " + eventCategoryEnum + 
+                            ", package category: " + packageCategoryEnum +
+                            ", event date: " + (eventDate != null ? eventDate : "not specified"));
+                
+            final java.util.Date finalEventDate = eventDate;
+            
+            List<Offer> offers = offerRepository.findAll().stream()
+                .filter(offer -> {
+                    boolean matchesEventCategory = offer.getEventCategories() != null && 
+                                              offer.getEventCategories().contains(eventCategoryEnum);
+                    boolean matchesPackageCategory = offer.getPackageCategories() != null && 
+                                                offer.getPackageCategories().contains(packageCategoryEnum);
+                    boolean isActive = offer.isOfferStatus();
+                    
+                    // Check if event date is within offer validity period
+                    boolean isDateValid = true; // Default if no date specified
+                    if (finalEventDate != null) {
+                        isDateValid = (offer.getStartDate().before(finalEventDate) || offer.getStartDate().equals(finalEventDate)) &&
+                                      (offer.getEndDate().after(finalEventDate) || offer.getEndDate().equals(finalEventDate));
+                    }
+                    
+                    System.out.println("Offer: " + offer.getOfferName() + 
+                                    ", matches event category: " + matchesEventCategory + 
+                                    ", matches package category: " + matchesPackageCategory + 
+                                    ", is active: " + isActive +
+                                    ", valid for event date: " + isDateValid +
+                                    ", start date: " + offer.getStartDate() +
+                                    ", end date: " + offer.getEndDate());
+                    
+                    return matchesEventCategory && matchesPackageCategory && isActive && isDateValid;
+                })
+                .collect(java.util.stream.Collectors.toList());
+                
+            System.out.println("Found " + offers.size() + " matching offers");
+                
+            if(offers.size() > 0){
+                List<ResponseGetAllOffers> offerDTOList = offerMapper.EntityListToDTOList(offers);
+                return offerDTOList;
+            }
+            return List.of();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid category value: " + e.getMessage());
+            return List.of();
+        } catch (Exception e) {
+            System.out.println("Error in getOffersByCategories: " + e.getMessage());
+            e.printStackTrace();
+            return List.of();
+        }
+    }
 }

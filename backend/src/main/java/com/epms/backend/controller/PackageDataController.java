@@ -61,4 +61,19 @@ public class PackageDataController {
         List<PackageDataDTO> packagesByCategory = packageDataService.getPackagesByCategory(packageCategory);
         return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", packagesByCategory), HttpStatus.OK);
     }
+    
+    /**
+     * Get all active packages for a specific event category.
+     * This endpoint filters packages by both event category and active status (packageStatus = true)
+     */
+    @GetMapping(
+            path = {"/get-packages-by-event-category"},
+            params = "category"
+    )
+    public ResponseEntity<StandardResponse> getPackagesByEventCategory(@RequestParam(value = "category") String eventCategory){
+        System.out.println("Received request for active packages with event category: " + eventCategory);
+        List<PackageDataDTO> packagesByEventCategory = packageDataService.getPackagesByEventCategory(eventCategory);
+        System.out.println("Found " + packagesByEventCategory.size() + " active packages for event category: " + eventCategory);
+        return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", packagesByEventCategory), HttpStatus.OK);
+    }
 }

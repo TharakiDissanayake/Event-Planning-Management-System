@@ -24,12 +24,9 @@ public class EventServiceIMPL implements EventService {
     @Override
     public String saveEvent(EventDTO eventDTO) {
         Event event = eventMapper.DTOToEntity(eventDTO);
-        if(!eventRepository.existsById(event.getEventId())){
-            eventRepository.save(event);
-            return event.getEventTitle()+ " saved successfully.";
-        }else {
-            throw new NotFoundException("Event with Id "+ event.getEventId() + " already exists.");
-        }
+        // For a new event, we don't check if ID exists since it will be auto-generated
+        eventRepository.save(event);
+        return "Event saved successfully.";
     }
 
     @Override

@@ -17,4 +17,6 @@ public interface PackageDataService {
     String deletePackageById(int packageId);
 
     List<PackageDataDTO> getPackagesByCategory(PackageCategory packageCategory);
+    
+    List<PackageDataDTO> getPackagesByEventCategory(String eventCategory);
 }

@@ -4,6 +4,7 @@ import com.epms.backend.dto.PackageDataDTO;
 import com.epms.backend.dto.requests.RequestSavePackageDataDTO;
 import com.epms.backend.dto.requests.RequestUpdatePackageDataDTO;
 import com.epms.backend.entity.PackageData;
+import com.epms.backend.entity.enums.EventCategory;
 import com.epms.backend.entity.enums.PackageCategory;
 import com.epms.backend.exceptions.NotFoundException;
 import com.epms.backend.repository.PackageDataRepository;
@@ -72,6 +73,61 @@ public class PackageDataServiceIMPL implements PackageDataService {
 
     @Override
     public List<PackageDataDTO> getPackagesByCategory(PackageCategory packageCategory) {
-        return List.of();
+        List<PackageData> packageDataList = packageDataRepository.findByPackageCategory(packageCategory);
+        if(packageDataList.size() > 0){
+            List<PackageDataDTO> packageDataDTOList = packageDataMapper.EntityListToDTOList(packageDataList);
+            return packageDataDTOList;
+        } else {
+            return List.of();
+        }
+    }
+    
+    @Override
+    public List<PackageDataDTO> getPackagesByEventCategory(String eventCategory) {
+        try {
+            System.out.println("getPackagesByEventCategory called with: " + eventCategory);
+            
+            // Convert the string to the corresponding enum value
+            EventCategory eventCategoryEnum = EventCategory.valueOf(eventCategory);
+            System.out.println("Converted to enum value: " + eventCategoryEnum);
+            
+            // Get all packages
+            List<PackageData> allPackages = packageDataRepository.findAll();
+            System.out.println("Total packages found: " + allPackages.size());
+            
+            // Filter packages by event category AND active status
+            List<PackageData> packageDataList = allPackages.stream()
+                .filter(pkg -> {
+                    boolean containsCategory = pkg.getEventCategories() != null && pkg.getEventCategories().contains(eventCategoryEnum);
+                    boolean isActive = pkg.isPackageStatus(); // Check if package is active
+                    
+                    System.out.println("Package " + pkg.getPackageName() + 
+                                     " event categories: " + (pkg.getEventCategories() != null ? pkg.getEventCategories() : "null") + 
+                                     ", contains " + eventCategoryEnum + ": " + containsCategory +
+                                     ", active: " + isActive);
+                    
+                    // Only include packages that match both criteria: correct category AND active status
+                    return containsCategory && isActive;
+                })
+                .collect(java.util.stream.Collectors.toList());
+            
+            System.out.println("Filtered active packages count: " + packageDataList.size());
+                
+            if(packageDataList.size() > 0){
+                List<PackageDataDTO> packageDataDTOList = packageDataMapper.EntityListToDTOList(packageDataList);
+                return packageDataDTOList;
+            } else {
+                return List.of();
+            }
+        } catch (IllegalArgumentException e) {
+            // Handle case where the string doesn't match any enum value
+            System.out.println("Invalid event category: " + eventCategory);
+            e.printStackTrace();
+            return List.of();
+        } catch (Exception e) {
+            System.out.println("Error in getPackagesByEventCategory: " + e.getMessage());
+            e.printStackTrace();
+            return List.of();
+        }
     }
 }

@@ -94,6 +94,40 @@ export const packageService = {
       throw error.response?.data || error.message;
     }
   },
+  
+  // Get packages by event category (only returns active packages)
+  getPackagesByEventCategory: async (eventCategory) => {
+    try {
+      console.log(`Sending API request to get active packages for event category: ${eventCategory}`);
+      const response = await packageApi.get(`/package_data/get-packages-by-event-category?category=${eventCategory}`);
+      console.log('API response:', response);
+      
+      // Check the structure of the response
+      if (response && response.data) {
+        if (response.data.data && Array.isArray(response.data.data)) {
+          // Standard response format with nested data array
+          console.log(`Found ${response.data.data.length} active packages in response.data.data`);
+          return response.data.data;
+        } else if (Array.isArray(response.data)) {
+          // Direct array in response.data
+          console.log(`Found ${response.data.length} active packages in response.data`);
+          return response.data;
+        } else {
+          // Custom format
+          console.log('Unexpected response format:', response.data);
+          return response.data;
+        }
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching active packages by event category:', error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
+      throw error.response?.data || error.message;
+    }
+  },
 
   // Update package
   updatePackage: async (packageId, packageData) => {
