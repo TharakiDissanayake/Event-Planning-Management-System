@@ -31,6 +31,9 @@ public class Event {
 
     @Column(name = "start_time", nullable = false)
     private String startTime;
+    
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
     @Enumerated
     @Column(name = "status", nullable = false)
@@ -89,6 +92,14 @@ public class Event {
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Status getStatus() {

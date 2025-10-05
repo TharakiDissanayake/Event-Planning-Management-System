@@ -31,6 +31,7 @@ const AddEventForm = () => {
         eventTitle: "",
         eventdate: "",
         startTime: "",
+        description: "",
         packageId: "",
         offerId: "",
         status: "",
@@ -212,6 +213,7 @@ const AddEventForm = () => {
             eventType: formData.category,
             eventDate: formData.eventdate,
             startTime: formData.startTime || "09:00",
+            description: formData.description || "No description provided",
             packageName: selectedPkg.packageName,
             packagePrice: selectedPkg.packagePrice,
             offerName: selectedOffer ? selectedOffer.offerName : "No Offer",
@@ -229,6 +231,7 @@ const AddEventForm = () => {
             eventTitle: "",
             eventdate: "",
             startTime: "",
+            description: "",
             packageId: "",
             offerId: "",
             status: "",
@@ -272,6 +275,7 @@ const AddEventForm = () => {
                 eventCategory: formData.category,
                 eventDate: formData.eventdate,
                 startTime: formData.startTime || "09:00",
+                description: formData.description,
                 packageId: formData.packageId,
                 offerId: formData.offerId || null,
                 status: formData.status
@@ -424,6 +428,21 @@ const AddEventForm = () => {
                             placeholder="09:00"
                             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
                         />
+                    </div>
+                    
+                    {/* Description */}
+                    <div className="grid grid-cols-2 gap-4 items-center">
+                        <label className="text-lg font-semibold text-gray-700">
+                            Description:
+                        </label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            placeholder="Enter event description"
+                            rows="3"
+                            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        ></textarea>
                     </div>
 
                     {/* Package Dropdown */}

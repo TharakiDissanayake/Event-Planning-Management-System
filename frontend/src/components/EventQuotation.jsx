@@ -39,7 +39,7 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Blurred background overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-xs"></div>
-      <div className="relative bg-white rounded-xl shadow-lg w-[600px] h-[700px] p-8 border-6 border-secondary flex flex-col z-10">
+      <div className="relative bg-white rounded-xl shadow-lg w-[600px] max-h-[90vh] p-8 border-6 border-secondary flex flex-col z-10 overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -53,12 +53,12 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
         </button>
 
         {/* Title */}
-        <h2 className="text-3xl font-bold text-center mb-8 text-primary">
+        <h2 className="text-3xl font-bold text-center mb-6 text-primary">
           Event Quotation
         </h2>
 
-        {/* Quotation Details */}
-        <div className="flex-1 space-y-6">
+        {/* Quotation Details - Scrollable Content */}
+        <div className="flex-1 space-y-6 overflow-y-auto pr-2">
           <div className="border-b pb-4">
             <h3 className="text-xl font-semibold mb-4">Customer & Event Information</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -77,6 +77,10 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
               <div>
                 <span className="font-semibold">Event Date:</span>
                 <p className="text-gray-700">{eventData.eventDate}</p>
+              </div>
+              <div className="col-span-2">
+                <span className="font-semibold">Description:</span>
+                <p className="text-gray-700">{eventData.description || "No description provided"}</p>
               </div>
             </div>
           </div>
@@ -118,26 +122,28 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-4 mt-6">
-          <button
-            onClick={handlePrint}
-            className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-blue-600 transition"
-          >
-            Print
-          </button>
-          <button
-            onClick={handleDownload}
-            className="flex-1 bg-green-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-green-600 transition"
-          >
-            Download PDF
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-gray-600 transition"
-          >
-            Close
-          </button>
+        {/* Action Buttons - Fixed at the bottom */}
+        <div className="mt-6 pt-4 border-t border-gray-200 sticky bottom-0 bg-white">
+          <div className="flex gap-4">
+            <button
+              onClick={handlePrint}
+              className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-blue-600 transition"
+            >
+              Print
+            </button>
+            <button
+              onClick={handleDownload}
+              className="flex-1 bg-green-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-green-600 transition"
+            >
+              Download PDF
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-gray-600 transition"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

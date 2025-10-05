@@ -23,6 +23,7 @@ public class EventDTO {
     private String eventTitle;
     private LocalDate eventDate;
     private String startTime;
+    private String description;
     private Status status;
     private String eventImage;
     private int packageId;
@@ -69,6 +70,14 @@ public class EventDTO {
     
     public void setStartTime(String startTime) {
         this.startTime = startTime;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     public Status getStatus() {

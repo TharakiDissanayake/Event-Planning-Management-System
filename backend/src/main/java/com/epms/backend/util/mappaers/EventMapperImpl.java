@@ -24,6 +24,7 @@ public class EventMapperImpl implements EventMapper {
         event.setEventTitle(eventDTO.getEventTitle());
         event.setEventDate(eventDTO.getEventDate());
         event.setStartTime(eventDTO.getStartTime());
+        event.setDescription(eventDTO.getDescription());
         event.setStatus(eventDTO.getStatus());
         event.setIdentityNumber(eventDTO.getIdentityNumber());
         event.setEventImage(eventDTO.getEventImage());
@@ -79,6 +80,7 @@ public class EventMapperImpl implements EventMapper {
         eventDTO.setEventTitle(event.getEventTitle());
         eventDTO.setEventDate(event.getEventDate());
         eventDTO.setStartTime(event.getStartTime());
+        eventDTO.setDescription(event.getDescription());
         eventDTO.setStatus(event.getStatus());
         eventDTO.setIdentityNumber(event.getIdentityNumber());
         eventDTO.setEventImage(event.getEventImage());
