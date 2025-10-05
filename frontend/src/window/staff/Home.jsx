@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/SideBar";
 import logo from "../../assets/icons/logo.png";
 import EventCard from "../../components/EventCard";
 import chatbot from "../../assets/icons/chatbot.gif"
 import CardContainer from "../../components/CardContainer";
 import EventDetailPopup from "../../components/EventDetailPopup";
+import { eventService } from "../../services/eventService";
 
 // Example event data
 const events = [
@@ -84,12 +85,38 @@ const events = [
 ];
 
 const Home = () => {
-    const navigate = useNavigate(); // Add this
+    const navigate = useNavigate();
     const [popupOpen, setPopupOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [pendingEvents, setPendingEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Fetch pending events when component mounts
+    useEffect(() => {
+        const fetchPendingEvents = async () => {
+            try {
+                setLoading(true);
+                const response = await eventService.getEventsByStatus('PENDING');
+                console.log('Pending events:', response);
+                if (response && response.data) {
+                    console.log('First event data:', response.data[0]); // Log the first event to see its structure
+                    setPendingEvents(response.data);
+                }
+            } catch (err) {
+                console.error('Error fetching pending events:', err);
+                setError(err.message || 'Failed to load pending events');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPendingEvents();
+    }, []);
 
     // Handle card click to open popup
     const handleCardClick = (event) => {
+        console.log("Card clicked, event data:", event);
         setSelectedEvent(event);
         setPopupOpen(true);
     };
@@ -101,12 +128,14 @@ const Home = () => {
 
     // Map event data for popup
     const getPopupData = (event) => ({
-        customerId: "EV001",
-        customerName: "John Doe",
-        eventType: event.title,
-        eventDate: event.date,
-        status: "Confirmed",
-        image: event.image,
+        eventId: event.eventId,
+        customerId: event.identityNumber?.identityNumber || "Unknown",
+        customerName: event.identityNumber?.customerName || "Unknown Customer",
+        eventType: event.eventTitle,
+        eventDate: event.eventDate,
+        status: event.status,
+        image: event.eventImage,
+        description: event.description
     });
 
     return (
@@ -126,16 +155,31 @@ const Home = () => {
                     {/* Event Cards Container with scroll */}
                     <div>
                         <CardContainer>
-                            {events.map((event, idx) => (
-                                <EventCard
-                                    key={idx}
-                                    image={event.image}
-                                    title={event.title}
-                                    description={event.description}
-                                    date={event.date}
-                                    onClick={() => handleCardClick(event)}
-                                />
-                            ))}
+                            {loading ? (
+                                <div className="w-full text-center p-10">
+                                    <p className="text-xl text-gray-500">Loading events...</p>
+                                </div>
+                            ) : (
+                                <>
+                                    {pendingEvents.length > 0 ? (
+                                        pendingEvents.map((event, idx) => (
+                                            <EventCard
+                                                key={idx}
+                                                image={event.eventImage || "https://via.placeholder.com/300x120.png?text=Event"}
+                                                title={event.eventTitle}
+                                                description={event.description || "No description provided"}
+                                                date={event.eventDate}
+                                                status={event.status}
+                                                onClick={() => handleCardClick(event)}
+                                            />
+                                        ))
+                                    ) : (
+                                        <div className="w-full text-center p-10">
+                                            <p className="text-xl text-gray-500">No pending events found</p>
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </CardContainer>
                     </div>
                     {/* Go To Calendar */}

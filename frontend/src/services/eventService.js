@@ -124,6 +124,16 @@ export const eventService = {
       throw error.response?.data || error.message;
     }
   },
+  
+  // Get events by status
+  getEventsByStatus: async (status) => {
+    try {
+      const response = await eventApi.get(`/event/get-events-by-status?status=${status}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
 
   // Update event
   updateEvent: async (eventId, eventData) => {

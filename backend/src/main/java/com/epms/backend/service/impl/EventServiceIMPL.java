@@ -7,6 +7,7 @@ import com.epms.backend.entity.Customer;
 import com.epms.backend.entity.Event;
 import com.epms.backend.entity.Offer;
 import com.epms.backend.entity.PackageData;
+import com.epms.backend.entity.enums.Status;
 import com.epms.backend.exceptions.NotFoundException;
 import com.epms.backend.repository.CustomerRepository;
 import com.epms.backend.repository.EventRepository;
@@ -70,6 +71,17 @@ public class EventServiceIMPL implements EventService {
             return eventDTOList;
         }else{
             throw new NotFoundException("No packages found");
+        }
+    }
+    
+    @Override
+    public List<ResponseGetAllEvents> getEventsByStatus(Status status) {
+        List<Event> eventList = eventRepository.findByStatus(status);
+        if(eventList.size() > 0){
+            List<ResponseGetAllEvents> eventDTOList = eventMapper.EntityListToDTOList(eventList);
+            return eventDTOList;
+        }else{
+            throw new NotFoundException("No events found with status: " + status);
         }
     }
 

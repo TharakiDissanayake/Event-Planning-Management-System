@@ -59,6 +59,9 @@ public class EventMapperImpl implements EventMapper {
             response.setEventTitle(event.getEventTitle());
             response.setEventDate(event.getEventDate());
             response.setIdentityNumber(event.getIdentityNumber());
+            response.setStatus(event.getStatus());
+            response.setDescription(event.getDescription());
+            response.setEventImage(event.getEventImage());
             
             responseList.add(response);
         }

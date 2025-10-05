@@ -5,6 +5,7 @@ import com.epms.backend.dto.EventDTO;
 import com.epms.backend.dto.PackageDataDTO;
 import com.epms.backend.dto.responses.ResponseGetAllEvents;
 import com.epms.backend.entity.enums.PackageCategory;
+import com.epms.backend.entity.enums.Status;
 import com.epms.backend.service.EventService;
 import com.epms.backend.util.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,5 +53,28 @@ public class EventController {
     public ResponseEntity<StandardResponse> getEventById(@RequestParam(value = "id") int eventId){
         EventDTO eventDTO = eventService.getEventById(eventId);
         return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", eventDTO), HttpStatus.OK);
+    }
+    
+    @GetMapping(
+            path = {"/get-events-by-status"},
+            params = "status"
+    )
+    public ResponseEntity<StandardResponse> getEventsByStatus(@RequestParam(value = "status") String status){
+        try {
+            // Convert string to Status enum
+            Status statusEnum = Status.valueOf(status.toUpperCase());
+            List<ResponseGetAllEvents> events = eventService.getEventsByStatus(statusEnum);
+            return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", events), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(
+                new StandardResponse(400, "ERROR", "Invalid status value: " + status),
+                HttpStatus.BAD_REQUEST
+            );
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                new StandardResponse(500, "ERROR", e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

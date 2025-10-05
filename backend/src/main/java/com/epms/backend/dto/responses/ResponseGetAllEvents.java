@@ -20,6 +20,9 @@ public class ResponseGetAllEvents {
     private String eventTitle;
     private LocalDate eventDate;
     private Customer identityNumber;
+    private Status status;
+    private String description;
+    private String eventImage;
     
     // Explicit getter and setter methods
     public int getEventId() {
@@ -60,5 +63,29 @@ public class ResponseGetAllEvents {
     
     public void setIdentityNumber(Customer identityNumber) {
         this.identityNumber = identityNumber;
+    }
+    
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getEventImage() {
+        return eventImage;
+    }
+
+    public void setEventImage(String eventImage) {
+        this.eventImage = eventImage;
     }
 }
