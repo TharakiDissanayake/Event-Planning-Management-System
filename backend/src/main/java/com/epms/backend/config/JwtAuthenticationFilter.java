@@ -35,22 +35,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
+        
+        String requestURI = request.getRequestURI();
+        logger.info("Processing request to URI: " + requestURI);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.info("No JWT token found in request to " + requestURI);
             filterChain.doFilter(request, response);
             return;
         }
 
         jwt = authHeader.substring(7);
+        logger.info("JWT token found in request to " + requestURI);
         
         try {
             userEmail = jwtUtil.extractUsername(jwt);
             String tokenType = jwtUtil.getTokenType(jwt);
+            boolean isExpired = jwtUtil.isTokenExpired(jwt);
+            boolean isValid = jwtUtil.validateToken(jwt);
+            
+            logger.info("JWT analysis - Email: " + userEmail + ", Type: " + tokenType + 
+                ", Expired: " + isExpired + ", Valid: " + isValid);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Only accept access tokens for API requests
-                if ("access".equals(tokenType) && jwtUtil.validateToken(jwt)) {
+                if ("access".equals(tokenType) && isValid) {
                     String role = jwtUtil.extractRole(jwt);
+                    logger.info("Setting authentication for user: " + userEmail + " with role: " + role);
                     
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userEmail,
@@ -59,10 +70,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.info("Authentication set successfully for user: " + userEmail);
+                } else {
+                    logger.warn("Token validation failed - Type: " + tokenType + ", Valid: " + isValid);
+                }
+            } else {
+                if (userEmail == null) {
+                    logger.warn("Username could not be extracted from token");
+                }
+                if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                    logger.info("SecurityContext already contains authentication");
                 }
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error("Cannot set user authentication: " + e.getMessage(), e);
         }
 
         filterChain.doFilter(request, response);

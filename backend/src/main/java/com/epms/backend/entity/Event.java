@@ -35,6 +35,17 @@ public class Event {
     @Enumerated
     @Column(name = "status", nullable = false)
     private Status status;
+    
+    @Column(name = "event_image")
+    private String eventImage;
+    
+    @ManyToOne
+    @JoinColumn(name = "package_id")
+    private PackageData packageData;
+    
+    @ManyToOne
+    @JoinColumn(name = "offer_id")
+    private Offer offer;
 
     @ManyToOne
     @JoinColumn(name = "identity_number", nullable = false)
@@ -94,5 +105,29 @@ public class Event {
 
     public void setIdentityNumber(Customer identityNumber) {
         this.identityNumber = identityNumber;
+    }
+    
+    public String getEventImage() {
+        return eventImage;
+    }
+
+    public void setEventImage(String eventImage) {
+        this.eventImage = eventImage;
+    }
+
+    public PackageData getPackageData() {
+        return packageData;
+    }
+
+    public void setPackageData(PackageData packageData) {
+        this.packageData = packageData;
+    }
+
+    public Offer getOffer() {
+        return offer;
+    }
+
+    public void setOffer(Offer offer) {
+        this.offer = offer;
     }
 }

@@ -1,6 +1,8 @@
 package com.epms.backend.dto;
 
 import com.epms.backend.entity.Customer;
+import com.epms.backend.entity.Offer;
+import com.epms.backend.entity.PackageData;
 import com.epms.backend.entity.enums.EventCategory;
 import com.epms.backend.entity.enums.Status;
 import jakarta.persistence.Column;
@@ -22,6 +24,10 @@ public class EventDTO {
     private LocalDate eventDate;
     private String startTime;
     private Status status;
+    private String eventImage;
+    private int packageId;
+    private Integer offerId;
+    private String customerId;
     private Customer identityNumber;
     
     // Explicit getter and setter methods
@@ -79,5 +85,37 @@ public class EventDTO {
     
     public void setIdentityNumber(Customer identityNumber) {
         this.identityNumber = identityNumber;
+    }
+    
+    public String getEventImage() {
+        return eventImage;
+    }
+    
+    public void setEventImage(String eventImage) {
+        this.eventImage = eventImage;
+    }
+    
+    public int getPackageId() {
+        return packageId;
+    }
+    
+    public void setPackageId(int packageId) {
+        this.packageId = packageId;
+    }
+    
+    public Integer getOfferId() {
+        return offerId;
+    }
+    
+    public void setOfferId(Integer offerId) {
+        this.offerId = offerId;
+    }
+    
+    public String getCustomerId() {
+        return customerId;
+    }
+    
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 }

@@ -28,7 +28,9 @@ const AddEventForm = () => {
     const [formData, setFormData] = useState({
         identitynumber: "",
         category: "",
+        eventTitle: "",
         eventdate: "",
+        startTime: "",
         packageId: "",
         offerId: "",
         status: "",
@@ -202,22 +204,21 @@ const AddEventForm = () => {
             return;
         }
         
-        // Prepare quotation data
+            // Prepare quotation data
         const quotationInfo = {
             identityNumber: formData.identitynumber,
             customerName: customerData?.customerName || "Customer",
-            eventName: `${formData.category} Event`, 
+            eventName: formData.eventTitle || `${formData.category} Event`,
             eventType: formData.category,
             eventDate: formData.eventdate,
+            startTime: formData.startTime || "09:00",
             packageName: selectedPkg.packageName,
             packagePrice: selectedPkg.packagePrice,
             offerName: selectedOffer ? selectedOffer.offerName : "No Offer",
             offerDiscount: selectedOffer ? selectedOffer.offerDiscount : 0,
             // Calculate final price with discount
             finalPrice: selectedPkg.packagePrice * (1 - (selectedOffer ? selectedOffer.offerDiscount / 100 : 0)),
-        };
-        
-        setQuotationData(quotationInfo);
+        };        setQuotationData(quotationInfo);
         setShowQuotation(true);
     };
 
@@ -225,7 +226,9 @@ const AddEventForm = () => {
         setFormData({
             identitynumber: "",
             category: "",
+            eventTitle: "",
             eventdate: "",
+            startTime: "",
             packageId: "",
             offerId: "",
             status: "",
@@ -265,11 +268,13 @@ const AddEventForm = () => {
             // Prepare event data for API
             const eventData = {
                 customerId: customerData.customerId,
+                eventTitle: formData.eventTitle || `${formData.category} Event`,
                 eventCategory: formData.category,
                 eventDate: formData.eventdate,
+                startTime: formData.startTime || "09:00",
                 packageId: formData.packageId,
                 offerId: formData.offerId || null,
-                eventStatus: formData.status
+                status: formData.status
             };
             
             // If there's an image, upload it first
@@ -279,10 +284,14 @@ const AddEventForm = () => {
                     eventData.eventImage = imageResponse.filename || imageResponse.url;
                 } catch (imageError) {
                     console.error("Error uploading image:", imageError);
+                    // Continue without image if upload fails
+                    alert("Image upload failed, but event will be saved without an image");
                 }
             }
             
-            // Save the event
+            console.log("Saving event with data:", eventData);
+            
+            // Save the event - eventService will try both authenticated and public endpoints
             const response = await eventService.createEvent(eventData);
             console.log("Event saved:", response);
             alert("Event saved successfully!");
@@ -373,6 +382,21 @@ const AddEventForm = () => {
                         </select>
                     </div>
 
+                    {/* Event Title */}
+                    <div className="grid grid-cols-2 gap-4 items-center">
+                        <label className="text-lg font-semibold text-gray-700">
+                            Event Title:
+                        </label>
+                        <input
+                            type="text"
+                            name="eventTitle"
+                            value={formData.eventTitle}
+                            onChange={handleChange}
+                            placeholder="Enter event title"
+                            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        />
+                    </div>
+
                     {/* Event Date */}
                     <div className="grid grid-cols-2 gap-4 items-center">
                         <label className="text-lg font-semibold text-gray-700">
@@ -383,6 +407,21 @@ const AddEventForm = () => {
                             name="eventdate"
                             value={formData.eventdate}
                             onChange={handleChange}
+                            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        />
+                    </div>
+
+                    {/* Start Time */}
+                    <div className="grid grid-cols-2 gap-4 items-center">
+                        <label className="text-lg font-semibold text-gray-700">
+                            Start Time:
+                        </label>
+                        <input
+                            type="time"
+                            name="startTime"
+                            value={formData.startTime}
+                            onChange={handleChange}
+                            placeholder="09:00"
                             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
                         />
                     </div>
@@ -485,9 +524,9 @@ const AddEventForm = () => {
                             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
                         >
                             <option value="">Select Status</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="pending">Pending</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="CONFIRMED">Confirmed</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="CANCELLED">Cancelled</option>
                         </select>
                     </div>
 

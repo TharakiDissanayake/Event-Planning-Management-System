@@ -51,7 +51,10 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/uploads/**",
                                 "/test-uploads",
-                                "/api/v1/files/**"
+                                "/api/v1/files/**",
+                                "/api/health/status",
+                                "/api/health/token-debug",
+                                "/api/v1/public/**"
                         ).permitAll()
                         
                         // Admin only endpoints

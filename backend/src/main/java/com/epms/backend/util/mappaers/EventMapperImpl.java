@@ -26,6 +26,18 @@ public class EventMapperImpl implements EventMapper {
         event.setStartTime(eventDTO.getStartTime());
         event.setStatus(eventDTO.getStatus());
         event.setIdentityNumber(eventDTO.getIdentityNumber());
+        event.setEventImage(eventDTO.getEventImage());
+        
+        // Handle package and offer relationships
+        if (eventDTO.getPackageId() > 0) {
+            // We'll need to set these in the service layer with proper repository lookups
+            // This will be handled in EventServiceIMPL
+        }
+        
+        if (eventDTO.getOfferId() != null && eventDTO.getOfferId() > 0) {
+            // We'll need to set these in the service layer with proper repository lookups
+            // This will be handled in EventServiceIMPL
+        }
         
         return event;
     }
@@ -69,6 +81,16 @@ public class EventMapperImpl implements EventMapper {
         eventDTO.setStartTime(event.getStartTime());
         eventDTO.setStatus(event.getStatus());
         eventDTO.setIdentityNumber(event.getIdentityNumber());
+        eventDTO.setEventImage(event.getEventImage());
+        
+        // Handle package and offer IDs
+        if (event.getPackageData() != null) {
+            eventDTO.setPackageId(event.getPackageData().getPackageId());
+        }
+        
+        if (event.getOffer() != null) {
+            eventDTO.setOfferId(event.getOffer().getOfferId());
+        }
         
         return eventDTO;
     }
