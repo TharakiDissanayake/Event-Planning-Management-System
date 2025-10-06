@@ -251,13 +251,35 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role, onEventUpdated }) 
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this event?")) {
-      // Handle delete logic here
-      console.log("Deleting event:", eventData);
-      // Add API call here to delete the event
-      alert("Event deleted successfully!");
-      onClose(); // Close the popup after deletion
+      try {
+        // Import eventService for API calls
+        const eventService = (await import('../services/eventService')).eventService;
+        
+        console.log("Deleting event with ID:", eventData.eventId);
+        
+        // Make API call to delete the event
+        await eventService.deleteEvent(eventData.eventId);
+        console.log("Event deleted successfully via API call");
+        
+        // Call the onEventUpdated callback if provided to refresh the events list
+        if (typeof onEventUpdated === 'function') {
+          console.log("Calling onEventUpdated to refresh events list after deletion");
+          onEventUpdated();
+        }
+        
+        // Show success message
+        alert("Event deleted successfully!");
+        
+        // Close the popup
+        if (typeof onClose === 'function') {
+          onClose();
+        }
+      } catch (error) {
+        console.error("Error deleting event:", error);
+        alert("Failed to delete the event. Please try again.");
+      }
     }
   };
 
