@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 import { packageService } from "../services/packageService";
 import { offerService } from "../services/offerService";
+import Swal from "sweetalert2";
 
 const UpdateEventDetails = ({ isOpen, onClose, eventData, onSave }) => {
   const [packages, setPackages] = useState([]);
@@ -220,11 +221,15 @@ const UpdateEventDetails = ({ isOpen, onClose, eventData, onSave }) => {
         });
       }
       
-      // Show success message
-      alert("Event updated successfully!");
+      // No need for a success message here as the parent component (EventDetailPopup) will show it
     } catch (error) {
       console.error("Error saving event:", error);
-      alert("Failed to update the event. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Failed to update the event. Please try again.',
+        confirmButtonColor: '#6d28d9',
+      });
     }
   };
 

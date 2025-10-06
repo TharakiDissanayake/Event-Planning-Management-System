@@ -1,5 +1,6 @@
 ﻿import React, { useState, useRef } from "react";
 import { offerService } from "../services/offerService";
+import Swal from "sweetalert2";
 
 const AddOfferForm = () => {
   const fileInputRef = useRef(null);
@@ -109,7 +110,12 @@ const AddOfferForm = () => {
       const response = await offerService.saveOffer(offerData);
       
       if (response.code === 201) {
-        setSubmitMessage("Offer created successfully!");
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Offer created successfully!',
+          confirmButtonColor: '#6d28d9',
+        });
         handleCancel(); // Reset form after successful submission
       } else {
         setSubmitMessage("Failed to create offer. Please try again.");
@@ -280,6 +286,7 @@ const AddOfferForm = () => {
             onChange={handleChange}
             rows="3"
             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+            required
           />
         </div>
 

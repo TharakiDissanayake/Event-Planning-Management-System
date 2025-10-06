@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 import UpdateEventDetails from "./UpdateEventDetails";
+import Swal from "sweetalert2";
 
 // Helper function to get package display value with enhanced fallbacks
 const getPackageDisplay = (eventData) => {
@@ -233,6 +234,13 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role, onEventUpdated }) 
       await eventService.updateEvent(updatedData.eventId, updatedData);
       console.log("Event update successful via API call");
       
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Event updated successfully!',
+        confirmButtonColor: '#6d28d9',
+      });
+      
       setIsEditMode(false);
       
       // Call the onEventUpdated callback if provided to refresh the events list
@@ -247,12 +255,27 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role, onEventUpdated }) 
       }
     } catch (error) {
       console.error("Error finalizing event update:", error);
-      alert("Failed to update event. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Failed to update event. Please try again.',
+        confirmButtonColor: '#6d28d9',
+      });
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Are you sure you want to delete this event?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6d28d9',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    
+    if (result.isConfirmed) {
       try {
         // Import eventService for API calls
         const eventService = (await import('../services/eventService')).eventService;
@@ -270,7 +293,12 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role, onEventUpdated }) 
         }
         
         // Show success message
-        alert("Event deleted successfully!");
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Event deleted successfully!',
+          confirmButtonColor: '#6d28d9',
+        });
         
         // Close the popup
         if (typeof onClose === 'function') {
@@ -278,7 +306,12 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role, onEventUpdated }) 
         }
       } catch (error) {
         console.error("Error deleting event:", error);
-        alert("Failed to delete the event. Please try again.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'Failed to delete the event. Please try again.',
+          confirmButtonColor: '#6d28d9',
+        });
       }
     }
   };

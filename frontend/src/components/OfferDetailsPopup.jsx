@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 import UpdateOfferDetails from "./UpdateOfferDetails";
 import { offerService } from "../services/offerService";
+import Swal from "sweetalert2";
 
 const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -24,7 +25,12 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
     // Try common ID keys
     const offerId = offerData?.id || offerData?.offerId || offerData?.offer_id;
     if (!offerId) {
-      alert('Error: Offer ID is missing. Cannot update offer.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Offer ID is missing. Cannot update offer.',
+        confirmButtonColor: '#6d28d9',
+      });
       return;
     }
     
@@ -59,7 +65,12 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
           }
         } catch (imageError) {
           console.error('Image upload failed:', imageError);
-          alert('Image upload failed, but other details will be updated.');
+          Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: 'Image upload failed, but other details will be updated.',
+            confirmButtonColor: '#6d28d9',
+          });
           // Keep current image if upload fails
           if (updatedData.image) {
             // If it's a full URL, extract the path part
@@ -100,7 +111,12 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
       }
       
       // Show success alert and then close the popup when user clicks OK
-      alert("Offer updated successfully!");
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Offer updated successfully!',
+        confirmButtonColor: '#6d28d9',
+      });
       
       // Reset edit mode and close the popup
       setIsEditMode(false);
@@ -118,13 +134,28 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
       } else {
         // For other errors, show a more specific message
         const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
-        alert("Error updating offer: " + errorMessage);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: "Error updating offer: " + errorMessage,
+          confirmButtonColor: '#6d28d9',
+        });
       }
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this offer?")) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Are you sure you want to delete this offer?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6d28d9',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    
+    if (result.isConfirmed) {
       try {
         const offerId = offerData?.id || offerData?.offerId || offerData?.offer_id;
         if (!offerId) {
@@ -134,7 +165,12 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
         console.log("Deleting offer:", offerData);
         await offerService.deleteOffer(offerId);
         
-        alert("Offer deleted successfully!");
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Offer deleted successfully!',
+          confirmButtonColor: '#6d28d9',
+        });
         
         // Refresh data if callback provided
         if (onUpdate) {
@@ -147,7 +183,12 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
         
         // Check for authentication errors
         if (error.response && error.response.status === 401) {
-          alert("Your session has expired. Please log in again to continue.");
+          Swal.fire({
+            icon: 'error',
+            title: 'Session Expired',
+            text: "Your session has expired. Please log in again to continue.",
+            confirmButtonColor: '#6d28d9',
+          });
           // This will trigger the auth context to handle the redirect
           window.dispatchEvent(new CustomEvent('tokenExpired', {
             detail: { type: 'TOKEN_EXPIRED' }
@@ -155,7 +196,12 @@ const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
         } else {
           // For other errors, show a more specific message
           const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
-          alert("Error deleting offer: " + errorMessage);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: "Error deleting offer: " + errorMessage,
+            confirmButtonColor: '#6d28d9',
+          });
         }
       }
     }

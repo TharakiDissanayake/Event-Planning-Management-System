@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { customerService } from "../services/customerService";
 import { useAuth } from "../contexts/AuthContext";
+import Swal from "sweetalert2";
 
 const AddCustomerForm = () => {
     const { user } = useAuth();
@@ -36,18 +37,64 @@ const AddCustomerForm = () => {
 
         try {
             const response = await customerService.createCustomer(formData);
-            setMessage({ 
-                type: 'success', 
-                text: 'Customer added successfully!' 
+            
+            // Show success alert using SweetAlert2
+            Swal.fire({
+                title: 'Success!',
+                text: 'Customer added successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#8B5CF6', // Purple color to match your theme
+                timer: 3000, // Auto close after 3 seconds
+                timerProgressBar: true,
+                toast: false,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
             });
             
             // Reset form after successful submission
             handleCancel();
         } catch (error) {
             console.error('Error creating customer:', error);
+            
+            // Check if it's a duplicate customer ID error - handle various error structures
+            if (error && typeof error === 'object') {
+                // Handle StandardResponse structure from backend
+                if (error.data && typeof error.data === 'string' && error.data.includes('already exists')) {
+                    setMessage({ 
+                        type: 'error', 
+                        text: 'This identity number already exists in the system. Please use a different ID.' 
+                    });
+                    return;
+                }
+                
+                // Handle unwrapped message from backend
+                if (error.message && typeof error.message === 'string' && error.message.includes('already exists')) {
+                    setMessage({ 
+                        type: 'error', 
+                        text: 'This identity number already exists in the system. Please use a different ID.' 
+                    });
+                    return;
+                }
+                
+                // If there's any message in the error object, use it
+                if (error.message) {
+                    setMessage({ 
+                        type: 'error', 
+                        text: error.message
+                    });
+                    return;
+                }
+            }
+            
+            // Default error message
             setMessage({ 
                 type: 'error', 
-                text: error.message || 'Failed to add customer. Please try again.' 
+                text: 'Failed to add customer. Please try again.' 
             });
         } finally {
             setLoading(false);
@@ -75,16 +122,7 @@ const AddCustomerForm = () => {
         <div className="bg-white shadow-md p-8 w-[1200px]">
             <h2 className="text-3xl font-bold text-center mb-8">Customer Details</h2>
 
-            {/* Success/Error Message */}
-            {message.text && (
-                <div className={`mb-6 p-4 rounded-md text-center ${
-                    message.type === 'success' 
-                        ? 'bg-green-100 text-green-800 border border-green-300' 
-                        : 'bg-red-100 text-red-800 border border-red-300'
-                }`}>
-                    {message.text}
-                </div>
-            )}
+            {/* Note: Success messages are now handled by SweetAlert2 */}
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Customer ID */}
@@ -163,14 +201,23 @@ const AddCustomerForm = () => {
                 {/* Address */}
                 <div className="grid grid-cols-2 gap-4 items-center">
                     <label className="text-lg font-semibold text-gray-700">Address:</label>
-                    <textarea
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        rows="3"
-                        className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
-                        required
-                    />
+                    <div className="flex flex-col">
+                        <textarea
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            rows="3"
+                            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+                            required
+                        />
+                        
+                        {/* Error Message - displayed below address field */}
+                        {message.text && message.type === 'error' && (
+                            <div className="mt-2 p-2 rounded-md text-left text-sm bg-red-100 text-red-800 border border-red-300">
+                                {message.text}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Submit and Cancel Buttons */}

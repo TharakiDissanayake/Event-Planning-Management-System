@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { customerService } from "../services/customerService";
 import { useAuth } from "../contexts/AuthContext";
 import closeIcon from "../assets/icons/close-icon.png";
+import Swal from "sweetalert2";
 
 const EditCustomerForm = ({ isOpen, onClose, customerData, onSuccess }) => {
     const { user } = useAuth();
@@ -60,9 +61,23 @@ const EditCustomerForm = ({ isOpen, onClose, customerData, onSuccess }) => {
             };
 
             const response = await customerService.updateCustomer(formData.customerId, updateData);
-            setMessage({
-                type: 'success',
-                text: 'Customer updated successfully!'
+            
+            // Show success alert using SweetAlert2
+            Swal.fire({
+                title: 'Success!',
+                text: 'Customer details updated successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#8B5CF6', // Purple color to match your theme
+                timer: 3000, // Auto close after 3 seconds
+                timerProgressBar: true,
+                toast: false,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
             });
 
             // Call onSuccess callback to refresh customer data
@@ -71,9 +86,8 @@ const EditCustomerForm = ({ isOpen, onClose, customerData, onSuccess }) => {
             }
 
             // Close popup after successful update
-            setTimeout(() => {
-                onClose();
-            }, 1500);
+            onClose();
+            
         } catch (error) {
             console.error('Error updating customer:', error);
             setMessage({
@@ -126,12 +140,9 @@ const EditCustomerForm = ({ isOpen, onClose, customerData, onSuccess }) => {
                     </button> */}
                 </div>
 
-                {/* Success/Error Message */}
-                {message.text && (
-                    <div className={`mb-6 p-4 rounded-md text-center ${message.type === 'success'
-                            ? 'bg-green-100 text-green-800 border border-green-300'
-                            : 'bg-red-100 text-red-800 border border-red-300'
-                        }`}>
+                {/* Error Message - Success is handled by SweetAlert2 */}
+                {message.text && message.type === 'error' && (
+                    <div className="mb-6 p-4 rounded-md text-center bg-red-100 text-red-800 border border-red-300">
                         {message.text}
                     </div>
                 )}

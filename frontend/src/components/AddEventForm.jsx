@@ -4,6 +4,7 @@ import { customerService } from "../services/customerService";
 import { packageService } from "../services/packageService";
 import { offerService } from "../services/offerService";
 import { eventService } from "../services/eventService";
+import Swal from "sweetalert2";
 
 const AddEventForm = () => {
     const fileInputRef = useRef(null);
@@ -263,7 +264,12 @@ const AddEventForm = () => {
         
         // Additional validation
         if (!formData.category || !formData.eventdate || !formData.packageId || !formData.status) {
-            alert("Please fill all required fields");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Please fill all required fields',
+                confirmButtonColor: '#6d28d9',
+            });
             return;
         }
         
@@ -289,7 +295,12 @@ const AddEventForm = () => {
                 } catch (imageError) {
                     console.error("Error uploading image:", imageError);
                     // Continue without image if upload fails
-                    alert("Image upload failed, but event will be saved without an image");
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Image upload failed, but event will be saved without an image',
+                        confirmButtonColor: '#6d28d9',
+                    });
                 }
             }
             
@@ -298,13 +309,24 @@ const AddEventForm = () => {
             // Save the event - eventService will try both authenticated and public endpoints
             const response = await eventService.createEvent(eventData);
             console.log("Event saved:", response);
-            alert("Event saved successfully!");
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Event saved successfully!',
+                confirmButtonColor: '#6d28d9',
+            });
             
             // Reset form after successful submission
             resetForm();
         } catch (error) {
             console.error("Error saving event:", error);
-            alert("Error saving event: " + (error.message || "Unknown error"));
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: "Error saving event: " + (error.message || "Unknown error"),
+                confirmButtonColor: '#6d28d9',
+            });
         }
     };
 

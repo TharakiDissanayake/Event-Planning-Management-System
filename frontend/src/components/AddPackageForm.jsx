@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { packageService } from "../services/packageService";
 import { useAuth } from "../contexts/AuthContext";
 import useFormPersistence from "../hooks/useFormPersistence";
+import Swal from "sweetalert2";
 
 const AddPackageForm = () => {
   const { user } = useAuth();
@@ -160,9 +161,23 @@ const AddPackageForm = () => {
       };
 
       const response = await packageService.createPackage(packageData);
-      setMessage({ 
-        type: 'success', 
-        text: 'Package created successfully!' 
+      
+      // Show success alert using SweetAlert2
+      Swal.fire({
+        title: 'Success!',
+        text: 'Package created successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#8B5CF6', // Purple color to match your theme
+        timer: 3000, // Auto close after 3 seconds
+        timerProgressBar: true,
+        toast: false,
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
       });
       
       // Clear saved form data on successful submission
@@ -205,11 +220,11 @@ const AddPackageForm = () => {
     <div className="bg-white shadow-md p-8 w-[1200px]">
       <h2 className="text-3xl font-bold text-center mb-8">Package Details</h2>
 
-      {/* Success/Error Message */}
-      {message.text && (
+      {/* Error/Info Message - Success is handled by SweetAlert2 */}
+      {message.text && (message.type === 'error' || message.type === 'info') && (
         <div className={`mb-6 p-4 rounded-md text-center ${
-          message.type === 'success' 
-            ? 'bg-green-100 text-green-800 border border-green-300' 
+          message.type === 'info' 
+            ? 'bg-blue-100 text-blue-800 border border-blue-300' 
             : 'bg-red-100 text-red-800 border border-red-300'
         }`}>
           {message.text}

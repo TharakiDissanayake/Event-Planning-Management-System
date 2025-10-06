@@ -71,7 +71,12 @@ export const customerService = {
       const response = await customerApi.post('/customer/save-customer', customerData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      console.log('Customer creation error response:', error.response);
+      if (error.response?.data) {
+        throw error.response.data;
+      } else {
+        throw new Error(error.message || 'An error occurred while creating customer');
+      }
     }
   },
 

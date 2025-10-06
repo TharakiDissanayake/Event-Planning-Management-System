@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 import UpdatePackageDetails from "./UpdatePackageDetails";
 import { packageService } from "../services/packageService";
+import Swal from "sweetalert2";
 
 const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdate }) => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -43,7 +44,12 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
           updatePayload.packageImage = imageResponse.filename; // Use uploaded filename (lowercase)
         } catch (imageError) {
           console.error('Image upload failed:', imageError);
-          alert('Image upload failed, but other details will be updated.');
+          Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: 'Image upload failed, but other details will be updated.',
+            confirmButtonColor: '#6d28d9',
+          });
           // Keep current image if upload fails
           if (updatedData.image && updatedData.image.includes('http://localhost:8082')) {
             updatePayload.packageImage = updatedData.image.replace('http://localhost:8082', '');
@@ -69,7 +75,12 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
       // Update package
       await packageService.updatePackage(packageId, updatePayload);
       
-      alert('Package updated successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Package updated successfully!',
+        confirmButtonColor: '#6d28d9',
+      });
       setIsEditMode(false);
       
       // Refresh data if callback provided
@@ -79,14 +90,29 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
       
     } catch (error) {
       console.error('Error updating package:', error);
-      alert('Failed to update package: ' + (error.message || 'Unknown error'));
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Failed to update package: ' + (error.message || 'Unknown error'),
+        confirmButtonColor: '#6d28d9',
+      });
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this package?")) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Are you sure you want to delete this package?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6d28d9',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    
+    if (result.isConfirmed) {
       try {
         const packageId = packageData?.id || packageData?.packageId;
         if (!packageId) {
@@ -96,7 +122,12 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
         console.log("Deleting package:", packageData);
         await packageService.deletePackage(packageId);
         
-        alert("Package deleted successfully!");
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Package deleted successfully!',
+          confirmButtonColor: '#6d28d9',
+        });
         
         // Refresh data if callback provided
         if (onUpdate) {
@@ -106,7 +137,12 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
         onClose(); // Close the popup after deletion
       } catch (error) {
         console.error('Error deleting package:', error);
-        alert('Failed to delete package: ' + (error.message || 'Unknown error'));
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'Failed to delete package: ' + (error.message || 'Unknown error'),
+          confirmButtonColor: '#6d28d9',
+        });
       }
     }
   };

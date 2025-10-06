@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
+import Swal from "sweetalert2";
 
 const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
   // Pure string-based date formatter for YYYY-MM-DD or YYYY/MM/DD
@@ -119,13 +120,23 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
     // Validate required fields
     if (!payload.name || !payload.discount || !payload.description || 
         !payload.startDate || !payload.endDate || !payload.status) {
-      alert("Please fill in all required fields");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please fill in all required fields',
+        confirmButtonColor: '#6d28d9',
+      });
       return;
     }
     
     // Validate at least one category selected
     if (payload.packageCategories.length === 0 || payload.eventCategories.length === 0) {
-      alert("Please select at least one package category and one event category");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please select at least one package category and one event category',
+        confirmButtonColor: '#6d28d9',
+      });
       return;
     }
     
