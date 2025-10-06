@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/SideBar";
 import logo from "../../assets/icons/logo.png";
@@ -18,35 +18,36 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Create a memoized function to fetch pending events
+    const fetchPendingEvents = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await eventService.getEventsByStatus('PENDING');
+            console.log('Pending events:', response);
+            if (response && response.data) {
+                console.log('First event data:', response.data[0]); // Log the first event to see its structure
+                
+                // Sort events by date (oldest first)
+                const sortedEvents = [...response.data].sort((a, b) => {
+                    const dateA = new Date(a.eventDate);
+                    const dateB = new Date(b.eventDate);
+                    return dateA - dateB; // For ascending order (oldest first)
+                });
+                
+                setPendingEvents(sortedEvents);
+            }
+        } catch (err) {
+            console.error('Error fetching pending events:', err);
+            setError(err.message || 'Failed to load pending events');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // Fetch pending events when component mounts
     useEffect(() => {
-        const fetchPendingEvents = async () => {
-            try {
-                setLoading(true);
-                const response = await eventService.getEventsByStatus('PENDING');
-                console.log('Pending events:', response);
-                if (response && response.data) {
-                    console.log('First event data:', response.data[0]); // Log the first event to see its structure
-                    
-                    // Sort events by date (oldest first)
-                    const sortedEvents = [...response.data].sort((a, b) => {
-                        const dateA = new Date(a.eventDate);
-                        const dateB = new Date(b.eventDate);
-                        return dateA - dateB; // For ascending order (oldest first)
-                    });
-                    
-                    setPendingEvents(sortedEvents);
-                }
-            } catch (err) {
-                console.error('Error fetching pending events:', err);
-                setError(err.message || 'Failed to load pending events');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchPendingEvents();
-    }, []);
+    }, [fetchPendingEvents]);
 
     // Handle card click to open popup
     const handleCardClick = async (event) => {
@@ -56,6 +57,7 @@ const Home = () => {
             // Fetch detailed event data to ensure we have all relationships
             const eventResponse = await eventService.getEventById(event.eventId);
             if (!eventResponse || !eventResponse.data) {
+                console.warn("Could not fetch detailed event data, using card data instead");
                 setSelectedEvent(event);
                 setPopupOpen(true);
                 return;
@@ -64,11 +66,14 @@ const Home = () => {
             const eventData = eventResponse.data;
             console.log("Fetched detailed event data:", eventData);
             
-            // Initialize mergedEvent with basic event data
+            // Initialize mergedEvent with basic event data, prioritizing detailed data
             const mergedEvent = {
-                ...event,
-                ...eventData,
-                eventImage: eventData.eventImage || event.eventImage
+                ...event,                          // First, get the card data
+                ...eventData,                      // Override with detailed API data
+                eventImage: eventData.eventImage || event.eventImage,  // Ensure image is preserved
+                // Preserve these fields from the card if they exist
+                packageName: event.packageName || eventData.packageName,
+                offerName: event.offerName || eventData.offerName
             };
             
             // Fetch package details if packageId exists
@@ -82,21 +87,8 @@ const Home = () => {
                     
                     if (packageResponse && packageResponse.data) {
                         console.log("Package response.data:", packageResponse.data);
-                        console.log("Package response.data type:", typeof packageResponse.data);
-                        console.log("Package response keys:", Object.keys(packageResponse.data));
                         
-                        // This is the Spring Boot StandardResponse structure
-                        // It typically has: statusCode, message, data fields
-                        if (packageResponse.data.data) {
-                            console.log("Package data field:", packageResponse.data.data);
-                            console.log("Package data type:", typeof packageResponse.data.data);
-                            
-                            if (typeof packageResponse.data.data === 'object') {
-                                console.log("Package data keys:", Object.keys(packageResponse.data.data));
-                            }
-                        }
-                        
-                        // Handle nested structure in the response
+                        // Extract package name with fallbacks
                         let packageName = null;
                         
                         // First try: StandardResponse pattern (statusCode, message, data)
@@ -116,8 +108,9 @@ const Home = () => {
                                 console.log("Found package name in Spring Boot response:", packageName);
                             }
                         }
-                        // Last resort: Look everywhere recursively
-                        else {
+                        
+                        // For extra thoroughness, do a recursive search
+                        if (!packageName) {
                             // Recursive function to find packageName in any nested object
                             const findPackageName = (obj) => {
                                 if (!obj || typeof obj !== 'object') return null;
@@ -125,7 +118,7 @@ const Home = () => {
                                 if (obj.packageName) return obj.packageName;
                                 
                                 for (const key in obj) {
-                                    if (typeof obj[key] === 'object') {
+                                    if (typeof obj[key] === 'object' && obj[key] !== null) {
                                         const found = findPackageName(obj[key]);
                                         if (found) return found;
                                     }
@@ -137,8 +130,9 @@ const Home = () => {
                             console.log("Found package name via deep search:", packageName);
                         }
                         
-                        // Use the extracted package name or fallback
+                        // Store package name in both conventional and special properties
                         mergedEvent.packageName = packageName || `Package #${eventData.packageId}`;
+                        mergedEvent._packageName = packageName; // Special property that won't be overwritten
                         console.log("Final extracted package name:", mergedEvent.packageName);
                     }
                 } catch (packageError) {
@@ -152,12 +146,42 @@ const Home = () => {
                 try {
                     console.log("Fetching offer details for ID:", eventData.offerId);
                     const offerResponse = await offerService.getOfferById(eventData.offerId);
+                    
+                    // Log the full offer response for debugging
+                    console.log("Offer API raw response:", offerResponse);
+                    
                     if (offerResponse && offerResponse.data) {
-                        console.log("Offer details:", offerResponse.data);
-                        // Add offer name to the event data
-                        mergedEvent.offerName = offerResponse.data.offerName || 
-                                             offerResponse.data.name || 
-                                             `Offer #${eventData.offerId}`;
+                        // Extract offer name with fallbacks
+                        let offerName = null;
+                        
+                        // Check different response formats
+                        if (offerResponse.data.data && offerResponse.data.data.offerName) {
+                            offerName = offerResponse.data.data.offerName;
+                        } else if (offerResponse.data.offerName) {
+                            offerName = offerResponse.data.offerName;
+                        } else {
+                            // Recursive search
+                            const findOfferName = (obj) => {
+                                if (!obj || typeof obj !== 'object') return null;
+                                
+                                if (obj.offerName) return obj.offerName;
+                                
+                                for (const key in obj) {
+                                    if (typeof obj[key] === 'object' && obj[key] !== null) {
+                                        const found = findOfferName(obj[key]);
+                                        if (found) return found;
+                                    }
+                                }
+                                return null;
+                            };
+                            
+                            offerName = findOfferName(offerResponse.data);
+                        }
+                        
+                        // Store offer name in both conventional and special properties
+                        mergedEvent.offerName = offerName || `Offer #${eventData.offerId}`;
+                        mergedEvent._offerName = offerName; // Special property that won't be overwritten
+                        console.log("Final extracted offer name:", mergedEvent.offerName);
                     }
                 } catch (offerError) {
                     console.error("Error fetching offer details:", offerError);
@@ -176,6 +200,16 @@ const Home = () => {
         setPopupOpen(true);
     };
 
+    // Handle closing the popup (including after updates)
+    const handleClosePopup = () => {
+        setPopupOpen(false);
+        setSelectedEvent(null);
+        
+        // Refresh the events list whenever the popup is closed
+        // This ensures updates are immediately visible
+        fetchPendingEvents();
+    };
+
     // Handle Go to Calendar click
     const handleGoToCalendar = () => {
         navigate('/admin/view-calendar'); // or '/staff/view-calendar' based on role
@@ -185,7 +219,7 @@ const Home = () => {
     const getPopupData = (event) => {
         console.log("Event data for popup:", event);
         
-        // Function to extract packageName or offerName from nested objects
+        // Enhanced function to extract packageName or offerName from nested objects
         const findNestedProperty = (obj, propertyNames) => {
             // Base case: not an object
             if (!obj || typeof obj !== 'object') return null;
@@ -195,9 +229,16 @@ const Home = () => {
                 if (obj[propName] !== undefined) return obj[propName];
             }
             
-            // Recursively check nested objects
+            // Recursively check nested objects (with more thorough depth)
             for (const key in obj) {
                 if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    if (key === 'data' && obj.data && typeof obj.data === 'object') {
+                        // Special handling for common API response pattern
+                        for (const propName of propertyNames) {
+                            if (obj.data[propName] !== undefined) return obj.data[propName];
+                        }
+                    }
+                    
                     const found = findNestedProperty(obj[key], propertyNames);
                     if (found) return found;
                 }
@@ -222,12 +263,44 @@ const Home = () => {
         inspectEvent(event);
         console.log("--- END INSPECTION ---");
         
-        // Extract package and offer names using our helper function
-        const extractedPackageName = findNestedProperty(event, ['packageName', 'name']);
-        const extractedOfferName = findNestedProperty(event, ['offerName', 'name']);
+        // Extract package and offer names using multiple approaches
         
-        console.log("Extracted Package Name:", extractedPackageName);
-        console.log("Extracted Offer Name:", extractedOfferName);
+        // First try: direct access from top-level event properties
+        let packageName = event.packageName || null;
+        let offerName = event.offerName || null;
+        
+        // Second try: Our special preserved properties that won't be overwritten
+        if (!packageName) packageName = event._packageName || null;
+        if (!offerName) offerName = event._offerName || null;
+        
+        // Third try: Deep recursive search for any property with packageName/offerName
+        if (!packageName) packageName = findNestedProperty(event, ['packageName', 'name']);
+        if (!offerName) offerName = findNestedProperty(event, ['offerName', 'name']);
+        
+        // Fourth try: Access from related objects
+        if (!packageName && event.package) {
+            if (typeof event.package === 'object') {
+                packageName = event.package.packageName || event.package.name || null;
+            }
+        }
+        
+        if (!offerName && event.offer) {
+            if (typeof event.offer === 'object') {
+                offerName = event.offer.offerName || event.offer.name || null;
+            }
+        }
+        
+        // Fifth try: Access from id objects
+        if (!packageName && event.packageId && typeof event.packageId === 'object') {
+            packageName = event.packageId.packageName || event.packageId.name || null;
+        }
+        
+        if (!offerName && event.offerId && typeof event.offerId === 'object') {
+            offerName = event.offerId.offerName || event.offerId.name || null;
+        }
+        
+        console.log("Final Package Name:", packageName);
+        console.log("Final Offer Name:", offerName);
         
         // Create a structured event object with all possible paths for package and offer data
         return {
@@ -244,12 +317,14 @@ const Home = () => {
             // Pass all package-related fields directly
             package: event.package,
             packageId: event.packageId,
-            packageName: extractedPackageName || event.packageName,
+            packageName: packageName || (event.packageId ? `Package #${event.packageId}` : "Not specified"),
+            _packageName: packageName, // Preserve extracted package name
             
             // Pass all offer-related fields directly
             offer: event.offer,
             offerId: event.offerId,
-            offerName: extractedOfferName || event.offerName,
+            offerName: offerName || (event.offerId ? `Offer #${event.offerId}` : "Not specified"),
+            _offerName: offerName, // Preserve extracted offer name
             
             status: event.status || "Pending",
             image: event.eventImage,
@@ -320,9 +395,10 @@ const Home = () => {
                     {/* Event Detail Popup */}
                     <EventDetailPopup
                         isOpen={popupOpen}
-                        onClose={() => setPopupOpen(false)}
+                        onClose={handleClosePopup}
                         eventData={selectedEvent ? getPopupData(selectedEvent) : null}
                         role="admin"
+                        onEventUpdated={fetchPendingEvents}
                     />
                 </div>
             </div>

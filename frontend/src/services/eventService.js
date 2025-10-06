@@ -161,6 +161,8 @@ export const eventService = {
       const formData = new FormData();
       formData.append('file', file);
       
+      console.log('Uploading image file:', file.name);
+      
       const response = await axios.post(
         `${API_BASE_URL}/files/upload`,
         formData,
@@ -172,6 +174,11 @@ export const eventService = {
           withCredentials: false, // Don't send credentials for file upload
         }
       );
+      
+      // Log the raw response to help with debugging
+      console.log('Image upload raw response:', response);
+      console.log('Image upload response data:', response.data);
+      
       return response.data;
     } catch (error) {
       console.error('Error uploading image:', error);

@@ -2,6 +2,7 @@ package com.epms.backend.service.impl;
 
 import com.epms.backend.dto.CustomerDTO;
 import com.epms.backend.dto.EventDTO;
+import com.epms.backend.dto.requests.RequestUpdateEventDTO;
 import com.epms.backend.dto.responses.ResponseGetAllEvents;
 import com.epms.backend.entity.Customer;
 import com.epms.backend.entity.Event;
@@ -17,6 +18,8 @@ import com.epms.backend.service.EventService;
 import com.epms.backend.util.mappaers.EventMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -81,7 +84,8 @@ public class EventServiceIMPL implements EventService {
             List<ResponseGetAllEvents> eventDTOList = eventMapper.EntityListToDTOList(eventList);
             return eventDTOList;
         }else{
-            throw new NotFoundException("No events found with status: " + status);
+            // Return an empty list instead of throwing an exception
+            return new ArrayList<>();
         }
     }
 
@@ -101,6 +105,44 @@ public class EventServiceIMPL implements EventService {
             Event event = eventRepository.getReferenceById(eventId);
             EventDTO eventDTO = eventMapper.EntityToDTO(event);
             return eventDTO;
+        }else {
+            throw new NotFoundException("Event with ID "+ eventId + " Not found.");
+        }
+    }
+
+    @Override
+    public String updateEvent(int eventId, RequestUpdateEventDTO requestUpdateEventDTO) {
+        if(eventRepository.existsById(eventId)){
+            Event event = eventRepository.getReferenceById(eventId);
+            event.setEventTitle(requestUpdateEventDTO.getEventTitle());
+            event.setStartTime(requestUpdateEventDTO.getStartTime());
+            event.setDescription(requestUpdateEventDTO.getDescription());
+            event.setStatus(requestUpdateEventDTO.getStatus());
+            
+            // Handle image path formatting
+            String imageFileName = requestUpdateEventDTO.getEventImage();
+            if (imageFileName != null && !imageFileName.isEmpty()) {
+                // Check if the image path is already properly formatted
+                if (!imageFileName.startsWith("/uploads/") && !imageFileName.startsWith("http")) {
+                    // If the image contains a path delimiter, extract just the filename
+                    if (imageFileName.contains("\\") || imageFileName.contains("/")) {
+                        imageFileName = imageFileName.substring(
+                            Math.max(
+                                imageFileName.lastIndexOf('\\') + 1,
+                                imageFileName.lastIndexOf('/') + 1
+                            )
+                        );
+                    }
+                    // Add the proper prefix
+                    imageFileName = "/uploads/" + imageFileName;
+                }
+            }
+            
+            // Set the properly formatted image path
+            event.setEventImage(imageFileName);
+            
+            eventRepository.save(event);
+            return "Event with ID "+ eventId + " updated successfully.";
         }else {
             throw new NotFoundException("Event with ID "+ eventId + " Not found.");
         }

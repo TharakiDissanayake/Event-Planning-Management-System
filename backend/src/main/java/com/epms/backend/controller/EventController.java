@@ -3,6 +3,8 @@ package com.epms.backend.controller;
 import com.epms.backend.dto.CustomerDTO;
 import com.epms.backend.dto.EventDTO;
 import com.epms.backend.dto.PackageDataDTO;
+import com.epms.backend.dto.requests.RequestUpdateEventDTO;
+import com.epms.backend.dto.requests.RequestUpdatePackageDataDTO;
 import com.epms.backend.dto.responses.ResponseGetAllEvents;
 import com.epms.backend.entity.enums.PackageCategory;
 import com.epms.backend.entity.enums.Status;
@@ -13,11 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/v1/event")
+@RequestMapping("api/v1/event")
 public class EventController {
     @Autowired
     private EventService eventService;
@@ -54,27 +58,27 @@ public class EventController {
         EventDTO eventDTO = eventService.getEventById(eventId);
         return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", eventDTO), HttpStatus.OK);
     }
+
+    @PutMapping(
+            path = {"/update-event"},
+            params = "id"
+    )
+    public ResponseEntity<StandardResponse> updateEvent(@RequestParam(value = "id") int eventId, @RequestBody RequestUpdateEventDTO requestUpdateEventDTO){
+        String message = eventService.updateEvent(eventId, requestUpdateEventDTO );
+        return new ResponseEntity<StandardResponse>(new StandardResponse(201, "SUCCESS", message), HttpStatus.CREATED);
+    }
     
     @GetMapping(
             path = {"/get-events-by-status"},
             params = "status"
     )
-    public ResponseEntity<StandardResponse> getEventsByStatus(@RequestParam(value = "status") String status){
+    public ResponseEntity<StandardResponse> getEventsByStatus(@RequestParam(value = "status") Status status){
         try {
-            // Convert string to Status enum
-            Status statusEnum = Status.valueOf(status.toUpperCase());
-            List<ResponseGetAllEvents> events = eventService.getEventsByStatus(statusEnum);
+            List<ResponseGetAllEvents> events = eventService.getEventsByStatus(status);
             return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", events), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(
-                new StandardResponse(400, "ERROR", "Invalid status value: " + status),
-                HttpStatus.BAD_REQUEST
-            );
         } catch (Exception e) {
-            return new ResponseEntity<>(
-                new StandardResponse(500, "ERROR", e.getMessage()),
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            // Return an empty list instead of an error when no events are found
+            return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", new ArrayList<>()), HttpStatus.OK);
         }
     }
 }

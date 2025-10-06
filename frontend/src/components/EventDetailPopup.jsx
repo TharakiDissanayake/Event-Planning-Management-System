@@ -2,33 +2,78 @@ import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 import UpdateEventDetails from "./UpdateEventDetails";
 
-// Helper function to get package display value with multiple fallbacks
+// Helper function to get package display value with enhanced fallbacks
 const getPackageDisplay = (eventData) => {
   if (!eventData) return "-";
   
-  // Try different ways to access package information
-  if (eventData.packageName) return eventData.packageName;
-  
-  if (eventData.package) {
-    if (typeof eventData.package === 'object' && eventData.package !== null) {
-      if (eventData.package.packageName) return eventData.package.packageName;
-      if (eventData.package.name) return eventData.package.name;
-    }
-    return eventData.package.toString();
+  // First check: Special property we set in Home.jsx
+  if (eventData._packageName) {
+    console.log("Found package name in _packageName special property:", eventData._packageName);
+    return eventData._packageName;
   }
   
+  // Second check: Standard property
+  if (eventData.packageName) {
+    console.log("Found package name in standard property:", eventData.packageName);
+    return eventData.packageName;
+  }
+  
+  // Third check: Package object
+  if (eventData.package) {
+    if (typeof eventData.package === 'object' && eventData.package !== null) {
+      if (eventData.package.packageName) {
+        console.log("Found package name in package.packageName:", eventData.package.packageName);
+        return eventData.package.packageName;
+      }
+      if (eventData.package.name) {
+        console.log("Found package name in package.name:", eventData.package.name);
+        return eventData.package.name;
+      }
+      
+      // Deep search within package object
+      for (const key in eventData.package) {
+        if (typeof eventData.package[key] === 'object' && eventData.package[key] !== null) {
+          if (eventData.package[key].packageName) {
+            console.log("Found package name in package nested property:", eventData.package[key].packageName);
+            return eventData.package[key].packageName;
+          }
+          if (eventData.package[key].name) {
+            console.log("Found package name in package nested property:", eventData.package[key].name);
+            return eventData.package[key].name;
+          }
+        }
+      }
+    }
+    
+    if (typeof eventData.package === 'string') {
+      console.log("Package is a string value:", eventData.package);
+      return eventData.package;
+    }
+    
+    return "Package object (no name found)";
+  }
+  
+  // Fourth check: packageId object
   if (eventData.packageId) {
     if (typeof eventData.packageId === 'object' && eventData.packageId !== null) {
-      if (eventData.packageId.packageName) return eventData.packageId.packageName;
-      if (eventData.packageId.name) return eventData.packageId.name;
+      if (eventData.packageId.packageName) {
+        console.log("Found package name in packageId.packageName:", eventData.packageId.packageName);
+        return eventData.packageId.packageName;
+      }
+      if (eventData.packageId.name) {
+        console.log("Found package name in packageId.name:", eventData.packageId.name);
+        return eventData.packageId.name;
+      }
       
       // Try to find packageName within nested objects
       for (const key in eventData.packageId) {
         if (typeof eventData.packageId[key] === 'object' && eventData.packageId[key] !== null) {
           if (eventData.packageId[key].packageName) {
+            console.log("Found package name in nested packageId property:", eventData.packageId[key].packageName);
             return eventData.packageId[key].packageName;
           }
           if (eventData.packageId[key].name) {
+            console.log("Found package name in nested packageId property:", eventData.packageId[key].name);
             return eventData.packageId[key].name;
           }
         }
@@ -37,39 +82,90 @@ const getPackageDisplay = (eventData) => {
       // If no name is found, try not to show the full object
       return "Package #" + (eventData.packageId.id || "Unknown");
     }
-    return eventData.packageId.toString();
+    
+    if (typeof eventData.packageId === 'number' || typeof eventData.packageId === 'string') {
+      console.log("PackageId is a simple value:", eventData.packageId);
+      return "Package #" + eventData.packageId;
+    }
   }
   
+  // Final fallback
+  console.log("No package name found using any method");
   return "-";
 };
 
-// Helper function to get offer display value with multiple fallbacks
+// Helper function to get offer display value with enhanced fallbacks
 const getOfferDisplay = (eventData) => {
   if (!eventData) return "-";
   
-  // Try different ways to access offer information
-  if (eventData.offerName) return eventData.offerName;
-  
-  if (eventData.offer) {
-    if (typeof eventData.offer === 'object' && eventData.offer !== null) {
-      if (eventData.offer.offerName) return eventData.offer.offerName;
-      if (eventData.offer.name) return eventData.offer.name;
-    }
-    return eventData.offer.toString();
+  // First check: Special property we set in Home.jsx
+  if (eventData._offerName) {
+    console.log("Found offer name in _offerName special property:", eventData._offerName);
+    return eventData._offerName;
   }
   
+  // Second check: Standard property
+  if (eventData.offerName) {
+    console.log("Found offer name in standard property:", eventData.offerName);
+    return eventData.offerName;
+  }
+  
+  // Third check: Offer object
+  if (eventData.offer) {
+    if (typeof eventData.offer === 'object' && eventData.offer !== null) {
+      if (eventData.offer.offerName) {
+        console.log("Found offer name in offer.offerName:", eventData.offer.offerName);
+        return eventData.offer.offerName;
+      }
+      if (eventData.offer.name) {
+        console.log("Found offer name in offer.name:", eventData.offer.name);
+        return eventData.offer.name;
+      }
+      
+      // Deep search within offer object
+      for (const key in eventData.offer) {
+        if (typeof eventData.offer[key] === 'object' && eventData.offer[key] !== null) {
+          if (eventData.offer[key].offerName) {
+            console.log("Found offer name in offer nested property:", eventData.offer[key].offerName);
+            return eventData.offer[key].offerName;
+          }
+          if (eventData.offer[key].name) {
+            console.log("Found offer name in offer nested property:", eventData.offer[key].name);
+            return eventData.offer[key].name;
+          }
+        }
+      }
+    }
+    
+    if (typeof eventData.offer === 'string') {
+      console.log("Offer is a string value:", eventData.offer);
+      return eventData.offer;
+    }
+    
+    return "Offer object (no name found)";
+  }
+  
+  // Fourth check: offerId object
   if (eventData.offerId) {
     if (typeof eventData.offerId === 'object' && eventData.offerId !== null) {
-      if (eventData.offerId.offerName) return eventData.offerId.offerName;
-      if (eventData.offerId.name) return eventData.offerId.name;
+      if (eventData.offerId.offerName) {
+        console.log("Found offer name in offerId.offerName:", eventData.offerId.offerName);
+        return eventData.offerId.offerName;
+      }
+      if (eventData.offerId.name) {
+        console.log("Found offer name in offerId.name:", eventData.offerId.name);
+        return eventData.offerId.name;
+      }
       
       // Try to find offerName within nested objects
       for (const key in eventData.offerId) {
         if (typeof eventData.offerId[key] === 'object' && eventData.offerId[key] !== null) {
           if (eventData.offerId[key].offerName) {
+            console.log("Found offer name in nested offerId property:", eventData.offerId[key].offerName);
             return eventData.offerId[key].offerName;
           }
           if (eventData.offerId[key].name) {
+            console.log("Found offer name in nested offerId property:", eventData.offerId[key].name);
             return eventData.offerId[key].name;
           }
         }
@@ -78,13 +174,19 @@ const getOfferDisplay = (eventData) => {
       // If no name is found, try not to show the full object
       return "Offer #" + (eventData.offerId.id || "Unknown");
     }
-    return eventData.offerId.toString();
+    
+    if (typeof eventData.offerId === 'number' || typeof eventData.offerId === 'string') {
+      console.log("OfferId is a simple value:", eventData.offerId);
+      return "Offer #" + eventData.offerId;
+    }
   }
   
+  // Final fallback
+  console.log("No offer name found using any method");
   return "-";
 };
 
-const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
+const EventDetailPopup = ({ isOpen, onClose, eventData, role, onEventUpdated }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   // Debug: Log eventData when component updates with detailed information
@@ -116,14 +218,37 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
   };
 
   const handleCloseEdit = () => {
+    console.log("Closing edit mode");
     setIsEditMode(false);
   };
 
-  const handleSave = (updatedData) => {
-    // Handle save logic here
-    console.log("Updated event data:", updatedData);
-    setIsEditMode(false);
-    // You can add API call here to save the data
+  const handleSave = async (updatedData) => {
+    try {
+      console.log("Event update data received from form:", updatedData);
+      
+      // Import and use eventService to update the event
+      const eventService = (await import('../services/eventService')).eventService;
+      
+      // Make API call to update the event
+      await eventService.updateEvent(updatedData.eventId, updatedData);
+      console.log("Event update successful via API call");
+      
+      setIsEditMode(false);
+      
+      // Call the onEventUpdated callback if provided to refresh the events list
+      if (typeof onEventUpdated === 'function') {
+        console.log("Calling onEventUpdated to refresh events list");
+        onEventUpdated();
+      }
+      
+      // If onClose is provided, call it to close the popup
+      if (typeof onClose === 'function') {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error finalizing event update:", error);
+      alert("Failed to update event. Please try again.");
+    }
   };
 
   const handleDelete = () => {
@@ -215,24 +340,24 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
           <div className="flex justify-between">
             <span className="font-semibold">Package:</span>
             <span className="border rounded px-2 py-1 w-48 truncate flex items-center" 
-                  title={eventData?.packageName || "No package selected"}>
+                  title={getPackageDisplay(eventData) || "No package selected"}>
               <span className="bg-primary text-white px-1.5 py-0.5 rounded mr-1 text-xs">
                 Package
               </span>
               <span className="truncate">
-                {eventData?.packageName || "Not specified"}
+                {getPackageDisplay(eventData) || "Not specified"}
               </span>
             </span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Offer:</span>
             <span className="border rounded px-2 py-1 w-48 truncate flex items-center" 
-                  title={eventData?.offerName || "No offer selected"}>
+                  title={getOfferDisplay(eventData) || "No offer selected"}>
               <span className="bg-secondary text-white px-1.5 py-0.5 rounded mr-1 text-xs">
                 Offer
               </span>
               <span className="truncate">
-                {eventData?.offerName || "Not specified"}
+                {getOfferDisplay(eventData) || "Not specified"}
               </span>
             </span>
           </div>

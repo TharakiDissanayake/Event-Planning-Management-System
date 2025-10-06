@@ -1,6 +1,7 @@
 package com.epms.backend.service;
 
 import com.epms.backend.dto.EventDTO;
+import com.epms.backend.dto.requests.RequestUpdateEventDTO;
 import com.epms.backend.dto.responses.ResponseGetAllEvents;
 import com.epms.backend.entity.enums.Status;
 
@@ -17,4 +18,6 @@ public interface EventService {
     String deleteEventById(int eventId);
 
     EventDTO getEventById(int eventId);
+
+    String updateEvent(int eventId, RequestUpdateEventDTO requestUpdateEventDTO);
 }

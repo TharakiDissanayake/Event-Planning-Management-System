@@ -543,9 +543,8 @@ const AddEventForm = () => {
                             className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
                         >
                             <option value="">Select Status</option>
-                            <option value="CONFIRMED">Confirmed</option>
                             <option value="PENDING">Pending</option>
-                            <option value="CANCELLED">Cancelled</option>
+                            <option value="COMPLETED">Completed</option>
                         </select>
                     </div>
 
