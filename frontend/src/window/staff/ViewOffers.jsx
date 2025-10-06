@@ -6,7 +6,7 @@ import CardContainer from "../../components/CardContainer";
 import OfferCard from "../../components/OfferCard";
 import OfferDetaiPopup from "../../components/OfferDetailsPopup";
 import { useAuth } from "../../contexts/AuthContext";
-import offerService from "../../services/offerService";
+import { offerService } from "../../services/offerService";
 
 const ViewOffers = () => {
   const { user } = useAuth();

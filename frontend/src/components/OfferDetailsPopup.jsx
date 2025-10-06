@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 import UpdateOfferDetails from "./UpdateOfferDetails";
-import offerService from "../services/offerService";
+import { offerService } from "../services/offerService";
 
 const OfferDetaiPopup = ({ isOpen, onClose, offerData, role, onUpdate }) => {
   const [isEditMode, setIsEditMode] = useState(false);

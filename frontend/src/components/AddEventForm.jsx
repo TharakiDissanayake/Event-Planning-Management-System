@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import EventQuotation from "./EventQuotation";
 import { customerService } from "../services/customerService";
 import { packageService } from "../services/packageService";
-import offerService from "../services/offerService";
+import { offerService } from "../services/offerService";
 import { eventService } from "../services/eventService";
 
 const AddEventForm = () => {

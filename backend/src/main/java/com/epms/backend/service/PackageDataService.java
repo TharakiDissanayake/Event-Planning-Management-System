@@ -19,4 +19,7 @@ public interface PackageDataService {
     List<PackageDataDTO> getPackagesByCategory(PackageCategory packageCategory);
     
     List<PackageDataDTO> getPackagesByEventCategory(String eventCategory);
+    
+    // Get package by ID
+    PackageDataDTO getPackageById(int packageId);
 }

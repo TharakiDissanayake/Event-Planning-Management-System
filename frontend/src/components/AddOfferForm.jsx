@@ -1,5 +1,5 @@
 ﻿import React, { useState, useRef } from "react";
-import offerService from "../services/offerService";
+import { offerService } from "../services/offerService";
 
 const AddOfferForm = () => {
   const fileInputRef = useRef(null);

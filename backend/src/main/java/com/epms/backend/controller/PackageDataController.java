@@ -4,6 +4,7 @@ import com.epms.backend.dto.PackageDataDTO;
 import com.epms.backend.dto.requests.RequestSavePackageDataDTO;
 import com.epms.backend.dto.requests.RequestUpdatePackageDataDTO;
 import com.epms.backend.entity.enums.PackageCategory;
+import com.epms.backend.exceptions.NotFoundException;
 import com.epms.backend.service.PackageDataService;
 import com.epms.backend.util.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,23 @@ public class PackageDataController {
     public ResponseEntity<StandardResponse> getPackagesByCategory(@RequestParam(value = "category")PackageCategory packageCategory){
         List<PackageDataDTO> packagesByCategory = packageDataService.getPackagesByCategory(packageCategory);
         return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", packagesByCategory), HttpStatus.OK);
+    }
+    
+    @GetMapping(
+            path = {"/get-package-by-id"},
+            params = "id"
+    )
+    public ResponseEntity<StandardResponse> getPackageById(@RequestParam(value = "id") int packageId){
+        try {
+            System.out.println("API call: Getting package by ID: " + packageId);
+            PackageDataDTO packageData = packageDataService.getPackageById(packageId);
+            System.out.println("Returning package name: " + packageData.getPackageName());
+            return new ResponseEntity<>(new StandardResponse(200, "SUCCESS", packageData), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(new StandardResponse(404, "NOT_FOUND", e.getMessage()), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new StandardResponse(500, "ERROR", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
     /**

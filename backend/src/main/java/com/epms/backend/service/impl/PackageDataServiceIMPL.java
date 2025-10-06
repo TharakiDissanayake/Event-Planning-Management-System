@@ -130,4 +130,18 @@ public class PackageDataServiceIMPL implements PackageDataService {
             return List.of();
         }
     }
+    
+    @Override
+    public PackageDataDTO getPackageById(int packageId) {
+        System.out.println("Getting package by ID: " + packageId);
+        
+        if (packageDataRepository.existsById(packageId)) {
+            PackageData packageData = packageDataRepository.getReferenceById(packageId);
+            System.out.println("Found package: " + packageData.getPackageName());
+            return packageDataMapper.EntityToDTO(packageData);
+        } else {
+            System.out.println("Package not found with ID: " + packageId);
+            throw new NotFoundException("Package with ID " + packageId + " not found.");
+        }
+    }
 }

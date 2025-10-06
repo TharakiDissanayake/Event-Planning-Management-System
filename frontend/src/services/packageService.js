@@ -74,6 +74,22 @@ export const packageService = {
       throw error.response?.data || error.message;
     }
   },
+  
+  // Get a package by ID
+  getPackageById: async (packageId) => {
+    try {
+      console.log(`Fetching package with ID: ${packageId}`);
+      const response = await packageApi.get(`/package_data/get-package-by-id?id=${packageId}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching package with ID ${packageId}:`, error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
+      throw error.response?.data || error.message;
+    }
+  },
 
   // Get all packages
   getAllPackages: async () => {

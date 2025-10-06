@@ -98,6 +98,23 @@ const offerService = {
       return response.data;
     } catch (error) {
       console.error('Error saving offer:', error);
+      throw error.response?.data || error.message;
+    }
+  },
+  
+  // Get offer by ID
+  getOfferById: async (offerId) => {
+    try {
+      console.log(`Fetching offer with ID: ${offerId}`);
+      const response = await api.get(`/v1/offer/get-offer-by-id?id=${offerId}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching offer with ID ${offerId}:`, error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
+      throw error.response?.data || error.message;
       throw error;
     }
   },
@@ -205,4 +222,4 @@ const offerService = {
   },
 };
 
-export default offerService;
+export { offerService };

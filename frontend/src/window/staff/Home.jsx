@@ -7,82 +7,8 @@ import chatbot from "../../assets/icons/chatbot.gif"
 import CardContainer from "../../components/CardContainer";
 import EventDetailPopup from "../../components/EventDetailPopup";
 import { eventService } from "../../services/eventService";
-
-// Example event data
-const events = [
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+1",
-        title: "Annual Gala",
-        description: "A grand celebration with dinner, music, and awards.",
-        date: "2025-10-15",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+2",
-        title: "Team Building",
-        description: "Fun activities to strengthen team spirit.",
-        date: "2025-11-02",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+3",
-        title: "Product Launch",
-        description: "Introducing our latest product to the market.",
-        date: "2025-12-01",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+1",
-        title: "Annual Gala",
-        description: "A grand celebration with dinner, music, and awards.",
-        date: "2025-10-15",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+2",
-        title: "Team Building",
-        description: "Fun activities to strengthen team spirit.",
-        date: "2025-11-02",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+3",
-        title: "Product Launch",
-        description: "Introducing our latest product to the market.",
-        date: "2025-12-01",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+1",
-        title: "Annual Gala",
-        description: "A grand celebration with dinner, music, and awards.",
-        date: "2025-10-15",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+2",
-        title: "Team Building",
-        description: "Fun activities to strengthen team spirit.",
-        date: "2025-11-02",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+3",
-        title: "Product Launch",
-        description: "Introducing our latest product to the market.",
-        date: "2025-12-01",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+1",
-        title: "Annual Gala",
-        description: "A grand celebration with dinner, music, and awards.",
-        date: "2025-10-15",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+2",
-        title: "Team Building",
-        description: "Fun activities to strengthen team spirit.",
-        date: "2025-11-02",
-    },
-    {
-        image: "https://via.placeholder.com/300x120.png?text=Event+3",
-        title: "Product Launch",
-        description: "Introducing our latest product to the market.",
-        date: "2025-12-01",
-    },
-];
+import { packageService } from "../../services/packageService";
+import { offerService } from "../../services/offerService";
 
 const Home = () => {
     const navigate = useNavigate();
@@ -123,9 +49,130 @@ const Home = () => {
     }, []);
 
     // Handle card click to open popup
-    const handleCardClick = (event) => {
+    const handleCardClick = async (event) => {
         console.log("Card clicked, event data:", event);
-        setSelectedEvent(event);
+        
+        try {
+            // Fetch detailed event data to ensure we have all relationships
+            const eventResponse = await eventService.getEventById(event.eventId);
+            if (!eventResponse || !eventResponse.data) {
+                setSelectedEvent(event);
+                setPopupOpen(true);
+                return;
+            }
+            
+            const eventData = eventResponse.data;
+            console.log("Fetched detailed event data:", eventData);
+            
+            // Initialize mergedEvent with basic event data
+            const mergedEvent = {
+                ...event,
+                ...eventData,
+                eventImage: eventData.eventImage || event.eventImage
+            };
+            
+            // Fetch package details if packageId exists
+            if (eventData.packageId) {
+                try {
+                    console.log("Fetching package details for ID:", eventData.packageId);
+                    const packageResponse = await packageService.getPackageById(eventData.packageId);
+                    
+                    // Log the full raw response for debugging
+                    console.log("Package API raw response:", packageResponse);
+                    
+                    if (packageResponse && packageResponse.data) {
+                        console.log("Package response.data:", packageResponse.data);
+                        console.log("Package response.data type:", typeof packageResponse.data);
+                        console.log("Package response keys:", Object.keys(packageResponse.data));
+                        
+                        // This is the Spring Boot StandardResponse structure
+                        // It typically has: statusCode, message, data fields
+                        if (packageResponse.data.data) {
+                            console.log("Package data field:", packageResponse.data.data);
+                            console.log("Package data type:", typeof packageResponse.data.data);
+                            
+                            if (typeof packageResponse.data.data === 'object') {
+                                console.log("Package data keys:", Object.keys(packageResponse.data.data));
+                            }
+                        }
+                        
+                        // Handle nested structure in the response
+                        let packageName = null;
+                        
+                        // First try: StandardResponse pattern (statusCode, message, data)
+                        if (packageResponse.data && packageResponse.data.data && typeof packageResponse.data.data === 'object') {
+                            packageName = packageResponse.data.data.packageName;
+                            console.log("Found package name in standard response:", packageName);
+                        } 
+                        // Second try: Direct data pattern
+                        else if (packageResponse.data && packageResponse.data.packageName) {
+                            packageName = packageResponse.data.packageName;
+                            console.log("Found package name directly:", packageName);
+                        }
+                        // Third try: Look for statusCode pattern from Spring Boot REST controller
+                        else if (packageResponse.data && packageResponse.data.statusCode === 200 && packageResponse.data.data) {
+                            if (typeof packageResponse.data.data === 'object' && packageResponse.data.data.packageName) {
+                                packageName = packageResponse.data.data.packageName;
+                                console.log("Found package name in Spring Boot response:", packageName);
+                            }
+                        }
+                        // Last resort: Look everywhere recursively
+                        else {
+                            // Recursive function to find packageName in any nested object
+                            const findPackageName = (obj) => {
+                                if (!obj || typeof obj !== 'object') return null;
+                                
+                                if (obj.packageName) return obj.packageName;
+                                
+                                for (const key in obj) {
+                                    if (typeof obj[key] === 'object') {
+                                        const found = findPackageName(obj[key]);
+                                        if (found) return found;
+                                    }
+                                }
+                                return null;
+                            };
+                            
+                            packageName = findPackageName(packageResponse.data);
+                            console.log("Found package name via deep search:", packageName);
+                        }
+                        
+                        // Use the extracted package name or fallback
+                        mergedEvent.packageName = packageName || `Package #${eventData.packageId}`;
+                        console.log("Final extracted package name:", mergedEvent.packageName);
+                    }
+                } catch (packageError) {
+                    console.error("Error fetching package details:", packageError);
+                    mergedEvent.packageName = `Package #${eventData.packageId}`;
+                }
+            }
+            
+            // Fetch offer details if offerId exists
+            if (eventData.offerId) {
+                try {
+                    console.log("Fetching offer details for ID:", eventData.offerId);
+                    const offerResponse = await offerService.getOfferById(eventData.offerId);
+                    if (offerResponse && offerResponse.data) {
+                        console.log("Offer details:", offerResponse.data);
+                        // Add offer name to the event data
+                        mergedEvent.offerName = offerResponse.data.offerName || 
+                                             offerResponse.data.name || 
+                                             `Offer #${eventData.offerId}`;
+                    }
+                } catch (offerError) {
+                    console.error("Error fetching offer details:", offerError);
+                    mergedEvent.offerName = `Offer #${eventData.offerId}`;
+                }
+            }
+            
+            console.log("Final merged event data with package and offer names:", mergedEvent);
+            setSelectedEvent(mergedEvent);
+        } catch (error) {
+            console.error("Error fetching event details:", error);
+            // Fallback to the original event data if fetch fails
+            setSelectedEvent(event);
+        }
+        
         setPopupOpen(true);
     };
 
@@ -135,17 +182,80 @@ const Home = () => {
     };
 
     // Map event data for popup
-    const getPopupData = (event) => ({
-        eventId: event.eventId,
-        customerId: event.identityNumber?.identityNumber || "Unknown",
-        customerName: event.identityNumber?.customerName || "Unknown Customer",
-        eventType: event.eventTitle,
-        eventDate: event.eventDate,
-        startTime: event.startTime,
-        status: event.status,
-        image: event.eventImage,
-        description: event.description
-    });
+    const getPopupData = (event) => {
+        console.log("Event data for popup:", event);
+        
+        // Function to extract packageName or offerName from nested objects
+        const findNestedProperty = (obj, propertyNames) => {
+            // Base case: not an object
+            if (!obj || typeof obj !== 'object') return null;
+            
+            // Check if obj directly has one of the property names
+            for (const propName of propertyNames) {
+                if (obj[propName] !== undefined) return obj[propName];
+            }
+            
+            // Recursively check nested objects
+            for (const key in obj) {
+                if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    const found = findNestedProperty(obj[key], propertyNames);
+                    if (found) return found;
+                }
+            }
+            
+            return null;
+        };
+        
+        // Deeply inspect the event object to find package and offer data
+        const inspectEvent = (obj, prefix = "") => {
+            if (!obj || typeof obj !== 'object') return;
+            
+            Object.keys(obj).forEach(key => {
+                console.log(`${prefix}${key}:`, obj[key]);
+                if (obj[key] && typeof obj[key] === 'object') {
+                    inspectEvent(obj[key], `${prefix}${key}.`);
+                }
+            });
+        };
+        
+        console.log("--- DETAILED EVENT INSPECTION ---");
+        inspectEvent(event);
+        console.log("--- END INSPECTION ---");
+        
+        // Extract package and offer names using our helper function
+        const extractedPackageName = findNestedProperty(event, ['packageName', 'name']);
+        const extractedOfferName = findNestedProperty(event, ['offerName', 'name']);
+        
+        console.log("Extracted Package Name:", extractedPackageName);
+        console.log("Extracted Offer Name:", extractedOfferName);
+        
+        // Create a structured event object with all possible paths for package and offer data
+        return {
+            eventId: event.eventId,
+            // Access customerId from the identityNumber object correctly
+            customerId: event.identityNumber?.customerId || event.customerId || "Unknown",
+            customerName: event.identityNumber?.customerName || event.customerName || "Unknown Customer",
+            // Use eventCategory instead of eventType for compatibility
+            eventType: event.eventCategory || event.eventType || "Not specified", 
+            eventTitle: event.eventTitle || "Not specified",
+            eventDate: event.eventDate,
+            startTime: event.startTime || "Not specified",
+            
+            // Pass all package-related fields directly
+            package: event.package,
+            packageId: event.packageId,
+            packageName: extractedPackageName || event.packageName,
+            
+            // Pass all offer-related fields directly
+            offer: event.offer,
+            offerId: event.offerId,
+            offerName: extractedOfferName || event.offerName,
+            
+            status: event.status || "Pending",
+            image: event.eventImage,
+            description: event.description || ""
+        };
+    };
 
     return (
         <div>

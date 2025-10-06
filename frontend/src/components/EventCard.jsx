@@ -33,8 +33,8 @@ function EventCard({ image, title, description, date, onClick, status, startTime
   return (
     <div
       onClick={onClick}
-      className="bg-gray rounded-2xl shadow-md p-2 w-72 h-70 cursor-pointer relative
-                 transition transform hover:scale-105 hover:shadow-xl"
+      className="bg-gray rounded-2xl shadow-md p-2 w-72 h-[250px] cursor-pointer relative
+                 transition transform hover:scale-105 hover:shadow-xl flex flex-col"
     >
       {/* Status Badge */}
       {status && (
@@ -43,23 +43,31 @@ function EventCard({ image, title, description, date, onClick, status, startTime
         </div>
       )}
       
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-30 object-cover rounded-xl"
-          onError={(e) => {
-            console.log('Image failed to load:', imageUrl);
-            e.target.style.display = 'none';
-          }}
-        />
-      ) : (
-        <div className="w-full h-30 bg-gray-200 rounded-xl flex items-center justify-center">
-          <span className="text-gray-500 text-sm">No Image</span>
-        </div>
-      )}
+      {/* Image section - always maintains same height */}
+      <div className="w-full h-32 rounded-xl overflow-hidden">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              console.log('Image failed to load:', imageUrl);
+              // Instead of hiding the image, replace with the placeholder
+              e.target.parentNode.innerHTML = `
+                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <span class="text-gray-500 text-sm">No Image</span>
+                </div>
+              `;
+            }}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">No Image</span>
+          </div>
+        )}
+      </div>
       <h3 className="text-xl font-semibold mb-2 text-gray-800">{title}</h3>
-      <p className="text-gray-600 text-sm line-clamp-3">{description}</p>
+      <p className="text-gray-600 text-sm line-clamp-3 flex-grow">{description}</p>
       {date && (
         <div className="mt-2 text-xs text-gray-950 font-medium text-right">
           Date: {new Date(date).toLocaleDateString('en-US', { 
