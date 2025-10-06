@@ -1,4 +1,4 @@
-function EventCard({ image, title, description, date, onClick, status }) {
+function EventCard({ image, title, description, date, onClick, status, startTime }) {
   // Status badge color mapping
   const getStatusColor = (status) => {
     switch (status?.toUpperCase()) {
@@ -15,6 +15,21 @@ function EventCard({ image, title, description, date, onClick, status }) {
     }
   };
 
+  // Construct full image URL if image exists
+  let imageUrl = null;
+  if (image) {
+    // If image already starts with /uploads/, use as is
+    if (image.startsWith('/uploads/')) {
+      imageUrl = `http://localhost:8082${image}`;
+    } else if (image.startsWith('http')) {
+      // If image already has http, use it as is (for placeholder images)
+      imageUrl = image;
+    } else {
+      // Otherwise, assume it's a filename and add the path
+      imageUrl = `http://localhost:8082/uploads/${image}`;
+    }
+  }
+
   return (
     <div
       onClick={onClick}
@@ -28,18 +43,35 @@ function EventCard({ image, title, description, date, onClick, status }) {
         </div>
       )}
       
-      {image && (
+      {imageUrl ? (
         <img
-          src={image}
+          src={imageUrl}
           alt={title}
           className="w-full h-30 object-cover rounded-xl"
+          onError={(e) => {
+            console.log('Image failed to load:', imageUrl);
+            e.target.style.display = 'none';
+          }}
         />
+      ) : (
+        <div className="w-full h-30 bg-gray-200 rounded-xl flex items-center justify-center">
+          <span className="text-gray-500 text-sm">No Image</span>
+        </div>
       )}
       <h3 className="text-xl font-semibold mb-2 text-gray-800">{title}</h3>
       <p className="text-gray-600 text-sm line-clamp-3">{description}</p>
       {date && (
         <div className="mt-2 text-xs text-gray-950 font-medium text-right">
-          Date: {date}
+          Date: {new Date(date).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+          })}
+          {startTime && (
+            <span className="ml-1">
+              at {startTime}
+            </span>
+          )}
         </div>
       )}
     </div>

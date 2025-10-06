@@ -82,8 +82,22 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Event Date:</span>
-            <span className="border rounded px-2 py-1 w-48">{eventData?.eventDate || "-"}</span>
+            <span className="border rounded px-2 py-1 w-48">
+              {eventData?.eventDate 
+                ? new Date(eventData.eventDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })
+                : "-"}
+            </span>
           </div>
+          {eventData?.startTime && (
+            <div className="flex justify-between">
+              <span className="font-semibold">Start Time:</span>
+              <span className="border rounded px-2 py-1 w-48">{eventData.startTime}</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="font-semibold">Status:</span>
             <span className="border rounded px-2 py-1 w-48">{eventData?.status || "-"}</span>
@@ -92,9 +106,20 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role }) => {
             <span className="font-semibold">Image:</span>
             {eventData?.image ? (
               <img
-                src={eventData.image}
+                src={
+                  eventData.image.startsWith('/uploads/')
+                    ? `http://localhost:8082${eventData.image}`
+                    : eventData.image.startsWith('http')
+                      ? eventData.image
+                      : `http://localhost:8082/uploads/${eventData.image}`
+                }
                 alt="Event"
                 className="w-24 h-16 object-cover rounded"
+                onError={(e) => {
+                  console.log('Image failed to load:', eventData.image);
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
               />
             ) : (
               <span className="border rounded px-2 py-1 w-48">-</span>

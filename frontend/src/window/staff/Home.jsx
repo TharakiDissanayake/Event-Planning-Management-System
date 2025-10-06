@@ -101,7 +101,15 @@ const Home = () => {
                 console.log('Pending events:', response);
                 if (response && response.data) {
                     console.log('First event data:', response.data[0]); // Log the first event to see its structure
-                    setPendingEvents(response.data);
+                    
+                    // Sort events by date (oldest first)
+                    const sortedEvents = [...response.data].sort((a, b) => {
+                        const dateA = new Date(a.eventDate);
+                        const dateB = new Date(b.eventDate);
+                        return dateA - dateB; // For ascending order (oldest first)
+                    });
+                    
+                    setPendingEvents(sortedEvents);
                 }
             } catch (err) {
                 console.error('Error fetching pending events:', err);
@@ -133,6 +141,7 @@ const Home = () => {
         customerName: event.identityNumber?.customerName || "Unknown Customer",
         eventType: event.eventTitle,
         eventDate: event.eventDate,
+        startTime: event.startTime,
         status: event.status,
         image: event.eventImage,
         description: event.description
@@ -170,6 +179,7 @@ const Home = () => {
                                                 description={event.description || "No description provided"}
                                                 date={event.eventDate}
                                                 status={event.status}
+                                                startTime={event.startTime}
                                                 onClick={() => handleCardClick(event)}
                                             />
                                         ))

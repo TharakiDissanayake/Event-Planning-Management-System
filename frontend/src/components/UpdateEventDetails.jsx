@@ -2,11 +2,24 @@ import React, { useState } from "react";
 import closeIcon from "../assets/icons/close-icon.png";
 
 const UpdateEventDetails = ({ isOpen, onClose, eventData, onSave }) => {
+  // Process the image URL for proper display
+  const processImageUrl = (imageUrl) => {
+    if (!imageUrl) return "";
+    if (imageUrl.startsWith('/uploads/')) {
+      return `http://localhost:8082${imageUrl}`;
+    } else if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    } else {
+      return `http://localhost:8082/uploads/${imageUrl}`;
+    }
+  };
+
   const [formData, setFormData] = useState({
     eventType: eventData?.eventType || "",
     eventDate: eventData?.eventDate || "",
     status: eventData?.status || "",
     image: eventData?.image || "",
+    imageUrl: processImageUrl(eventData?.image) || "",
   });
 
   if (!isOpen) return null;
@@ -26,7 +39,8 @@ const UpdateEventDetails = ({ isOpen, onClose, eventData, onSave }) => {
       const imageURL = URL.createObjectURL(file);
       setFormData((prev) => ({
         ...prev,
-        image: imageURL,
+        image: file.name, // Store the filename for backend
+        imageUrl: imageURL, // Store the preview URL for display
       }));
     }
   };
@@ -119,9 +133,13 @@ const UpdateEventDetails = ({ isOpen, onClose, eventData, onSave }) => {
               {formData.image ? (
                 <div className="relative">
                   <img
-                    src={formData.image}
+                    src={formData.imageUrl || formData.image}
                     alt="Event Preview"
                     className="w-full h-16 object-cover rounded"
+                    onError={(e) => {
+                      console.log('Image failed to load:', formData.imageUrl || formData.image);
+                      e.target.style.display = 'none';
+                    }}
                   />
                   <label
                     htmlFor="image-upload"
