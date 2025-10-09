@@ -94,7 +94,7 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Package Price:</span>
-                <span className="text-lg">${totals.packagePrice.toFixed(2)}</span>
+                <span className="text-lg">Rs.{totals.packagePrice.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Offer Name:</span>
@@ -106,12 +106,12 @@ const EventQuotation = ({ isOpen, onClose, eventData }) => {
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Discount Amount:</span>
-                <span className="text-lg text-green-600">-${totals.discountAmount.toFixed(2)}</span>
+                <span className="text-lg text-green-600">-Rs.{totals.discountAmount.toFixed(2)}</span>
               </div>
               <hr className="my-2" />
               <div className="flex justify-between text-xl font-bold">
                 <span>Total Price:</span>
-                <span className="text-primary">${totals.finalPrice.toFixed(2)}</span>
+                <span className="text-primary">Rs.{totals.finalPrice.toFixed(2)}</span>
               </div>
             </div>
           </div>

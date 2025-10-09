@@ -482,7 +482,7 @@ const AddEventForm = () => {
                                 {Array.isArray(packages) && packages.length > 0 ? (
                                     packages.map((pkg) => (
                                         <option key={pkg.packageId} value={pkg.packageId}>
-                                            {pkg.packageName} (${pkg.packagePrice}) - {pkg.packageCategory}
+                                            {pkg.packageName} (Rs.{pkg.packagePrice}) - {pkg.packageCategory}
                                         </option>
                                     ))
                                 ) : (
@@ -502,7 +502,7 @@ const AddEventForm = () => {
                             <label className="text-lg font-semibold text-gray-700">Package Details:</label>
                             <div className="border border-blue-200 bg-blue-50 rounded-md px-3 py-2">
                                 <p><span className="font-medium">Name:</span> {selectedPackage.packageName}</p>
-                                <p><span className="font-medium">Price:</span> ${selectedPackage.packagePrice}</p>
+                                <p><span className="font-medium">Price:</span> Rs.{selectedPackage.packagePrice}</p>
                                 <p><span className="font-medium">Capacity:</span> {selectedPackage.capacity} persons</p>
                             </div>
                         </div>

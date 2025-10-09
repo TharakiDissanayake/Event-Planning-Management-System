@@ -175,7 +175,8 @@ const UpdateOfferDetails = ({ isOpen, onClose, offerData, onSave }) => {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border rounded px-2 py-1 w-48 bg-gray-100"
+              readOnly
             />
           </div>
 

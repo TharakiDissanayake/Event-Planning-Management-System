@@ -9,9 +9,11 @@ import EventDetailPopup from "../../components/EventDetailPopup";
 import { eventService } from "../../services/eventService";
 import { packageService } from "../../services/packageService";
 import { offerService } from "../../services/offerService";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Home = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [popupOpen, setPopupOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [pendingEvents, setPendingEvents] = useState([]);
@@ -212,7 +214,9 @@ const Home = () => {
 
     // Handle Go to Calendar click
     const handleGoToCalendar = () => {
-        navigate('/admin/view-calendar'); // or '/staff/view-calendar' based on role
+        // Get user role and navigate to the appropriate calendar route
+        const userRole = user?.userRole?.toLowerCase() || user?.role?.toLowerCase() || 'staff';
+        navigate(`/${userRole}/view-calendar`);
     };
 
     // Map event data for popup
@@ -386,12 +390,12 @@ const Home = () => {
                             Go To Calendar -&gt;
                         </button>
                     </div>
-                    {/* Chatbot icon at right bottom */}
+                    {/* Chatbot icon at right bottom
                     <img
                         src={chatbot}
                         alt="Chatbot Logo"
                         className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
-                    />
+                    /> */}
                     {/* Event Detail Popup */}
                     <EventDetailPopup
                         isOpen={popupOpen}

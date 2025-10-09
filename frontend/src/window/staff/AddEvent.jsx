@@ -18,7 +18,7 @@ const AddEvent = () => {
                         className="absolute top-4 right-6 w-24 h-auto z-20"
                     />
                     <h1 className="text-5xl font-bold text-primary mb-6 mt-10 ml-6 drop-shadow-lg flex-shrink-0"> {/* Add flex-shrink-0 */}
-                        Add New Customer
+                        Add New Event
                     </h1>
                     
                     {/* Add Package Form in Card Container */}
@@ -30,12 +30,12 @@ const AddEvent = () => {
                         </CardContainer>
                     </div>
                     
-                    {/* Chatbot icon at right bottom */}
+                    {/* Chatbot icon at right bottom
                     <img
                         src={chatbot}
                         alt="Chatbot Logo"
                         className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
-                    />
+                    /> */}
                 </div>
             </div>
         </div>

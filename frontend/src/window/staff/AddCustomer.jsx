@@ -30,12 +30,12 @@ const AddCustomer = () => {
                         </CardContainer>
                     </div>
                     
-                    {/* Chatbot icon at right bottom */}
+                    {/* Chatbot icon at right bottom
                     <img
                         src={chatbot}
                         alt="Chatbot Logo"
                         className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
-                    />
+                    /> */}
                 </div>
             </div>
         </div>

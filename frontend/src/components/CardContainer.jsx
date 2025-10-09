@@ -3,7 +3,7 @@ function CardContainer({ children }) {
     <div
       className="container mx-auto px-6 border-2 border-secondary rounded-3xl"
       style={{
-        maxHeight: "calc(100vh - 260px)",
+        maxHeight: "calc(100vh - 250px)",
         overflowY: "auto",
         background: "rgba(255,255,255,0.85)",
       }}

@@ -255,12 +255,47 @@ const EventDetailPopup = ({ isOpen, onClose, eventData, role, onEventUpdated }) 
       }
     } catch (error) {
       console.error("Error finalizing event update:", error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'Failed to update event. Please try again.',
-        confirmButtonColor: '#6d28d9',
-      });
+      
+      // Get specific error message
+      let errorMessage = 'Failed to update event. Please try again.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error.response) {
+        errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+      }
+      
+      // Check if it's an authentication error
+      if (errorMessage.includes('session') || errorMessage.includes('expired') || 
+          errorMessage.includes('token') || errorMessage.includes('auth') || 
+          errorMessage.includes('Unauthorized')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Your session has expired. Please log out and sign in again.',
+          confirmButtonColor: '#6d28d9',
+          showCancelButton: true,
+          confirmButtonText: 'Log out now',
+          cancelButtonText: 'Stay here'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Clear tokens and redirect to login
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userInfo');
+            window.location.href = '/login';
+          }
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: errorMessage,
+          confirmButtonColor: '#6d28d9',
+        });
+      }
     }
   };
 

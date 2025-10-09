@@ -61,7 +61,7 @@ function OfferCard({ offerImage, offerName, offerDescription, startDate, endDate
         <span className={`px-2 py-1 rounded-full ${
           offerStatus ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          Status: {offerStatus ? 'Active' : 'Inactive'}
+           {offerStatus ? 'Active' : 'Inactive'}
         </span>
       </div>
     </div>

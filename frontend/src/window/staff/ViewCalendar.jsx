@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Sidebar from "../../components/SideBar";
 import logo from "../../assets/icons/logo.png";
 import chatbot from "../../assets/icons/chatbot.gif";
@@ -41,13 +41,12 @@ const ViewCalendar = () => {
         }
     };
 
-    // Fetch both pending and completed events
-    useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                setLoading(true);
-                
-                // Fetch both pending and completed events in parallel
+    // Define fetchEvents function using useCallback to avoid recreation on each render
+    const fetchEvents = useCallback(async () => {
+        try {
+            setLoading(true);
+            
+            // Fetch both pending and completed events in parallel
                 const [pendingResponse, completedResponse] = await Promise.all([
                     eventService.getEventsByStatus('PENDING'),
                     eventService.getEventsByStatus('COMPLETED')
@@ -120,10 +119,22 @@ const ViewCalendar = () => {
             } finally {
                 setLoading(false);
             }
-        };
-        
-        fetchEvents();
     }, []);
+    
+    // Use effect to fetch events initially and set up periodic refresh
+    useEffect(() => {
+        // Initial fetch
+        fetchEvents();
+        
+        // Set up interval to refresh data every 30 seconds
+        const refreshInterval = setInterval(() => {
+            console.log("Auto-refreshing calendar events data...");
+            fetchEvents();
+        }, 30000); // 30 seconds
+        
+        // Clean up interval on component unmount
+        return () => clearInterval(refreshInterval);
+    }, [fetchEvents]);
 
     return (
         <div className="h-screen overflow-hidden">
@@ -168,23 +179,27 @@ const ViewCalendar = () => {
                     {popupOpen && selectedEvent && (
                         <EventDetailPopup
                             event={selectedEvent}
-                            onClose={() => setPopupOpen(false)}
+                            onClose={() => {
+                                setPopupOpen(false);
+                                setSelectedEvent(null);
+                                // Refresh events when popup closes
+                                fetchEvents();
+                            }}
                             onEventUpdated={() => {
                                 setPopupOpen(false);
-                                // Re-fetch events to update the calendar
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 500);
+                                setSelectedEvent(null);
+                                // Refresh events after update
+                                fetchEvents();
                             }}
                         />
                     )}
 
-                    {/* Chatbot icon at right bottom */}
+                    {/* Chatbot icon at right bottom
                     <img
                         src={chatbot}
                         alt="Chatbot Logo"
                         className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
-                    />
+                    /> */}
                 </div>
             </div>
         </div>

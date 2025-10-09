@@ -19,7 +19,13 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requiredRole && user?.userRole !== requiredRole && user?.userRole !== 'ADMIN') {
+  // Check if user role matches the required role (case-insensitive)
+  // Also allow access if the user has ADMIN role (case-insensitive)
+  const userRole = user?.userRole?.toUpperCase() || user?.role?.toUpperCase() || '';
+  const requiredRoleUpper = requiredRole?.toUpperCase();
+  
+  if (requiredRole && userRole !== requiredRoleUpper && userRole !== 'ADMIN') {
+    console.log('Access denied. User role:', userRole, 'Required role:', requiredRoleUpper);
     // User doesn't have required role
     return (
       <div className="flex items-center justify-center min-h-screen">

@@ -34,8 +34,18 @@ function PackageCard({ packageImage, packageName, packageDescription, packageSta
       <h3 className="text-xl font-semibold mb-2 text-gray-800">{packageName}</h3>
       <p className="text-gray-600 text-sm line-clamp-3">{packageDescription}</p>
       <div className="flex-1"></div>
-      <div className="mt-2 text-xs text-gray-950 font-medium text-right">
-        Status: {packageStatus || 'No Status'}
+      <div className="mt-2 text-xs font-medium text-right">
+         {packageStatus ? (
+          <span className={`inline-block ml-1 px-2 py-1 rounded-full ${
+            packageStatus.toLowerCase() === 'active' 
+              ? 'bg-green-100 text-green-800 border border-green-400' 
+              : 'bg-red-100 text-red-800 border border-red-400'
+          }`}>
+            {packageStatus}
+          </span>
+        ) : (
+          'No Status'
+        )}
       </div>
     </div>
   );

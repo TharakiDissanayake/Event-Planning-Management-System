@@ -160,11 +160,11 @@ const ViewOffers = () => {
 					</h1>
 
 					{/* Search and filter controls */}
-					<div className="mb-6 ml-6 space-y-4">
-						{/* Search input */}
-						<div>
-							<label className="block font-semibold text-lg text-dark mb-2">Search Offers:</label>
-							<div className="flex gap-2 items-center">
+					<div className="mb-6 ml-6">
+						<div className="flex flex-wrap items-end gap-6">
+							{/* Search input */}
+							<div>
+								<label className="block font-semibold text-lg text-dark mb-2">Search Offers:</label>
 								<input
 									type="text"
 									placeholder="Search by offer name..."
@@ -172,6 +172,26 @@ const ViewOffers = () => {
 									value={searchTerm}
 									onChange={(e) => setSearchTerm(e.target.value)}
 								/>
+							</div>
+
+							{/* Dropdown to select offer type */}
+							<div>
+								<label className="block font-semibold text-lg text-dark mb-2">Filter by Offer Type:</label>
+								<select
+									className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+									value={selectedType}
+									onChange={(e) => setSelectedType(e.target.value)}
+								>
+									{offerTypes.map((type) => (
+										<option key={type} value={type}>
+											{type}
+										</option>
+									))}
+								</select>
+							</div>
+							
+							{/* Clear filters button */}
+							<div>
 								<button
 									onClick={clearSearch}
 									className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -179,22 +199,6 @@ const ViewOffers = () => {
 									Clear Filters
 								</button>
 							</div>
-						</div>
-
-						{/* Dropdown to select offer type */}
-						<div>
-							<label className="block font-semibold text-lg text-dark mb-2">Filter by Offer Type:</label>
-							<select
-								className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-								value={selectedType}
-								onChange={(e) => setSelectedType(e.target.value)}
-							>
-								{offerTypes.map((type) => (
-									<option key={type} value={type}>
-										{type}
-									</option>
-								))}
-							</select>
 						</div>
 					</div>
 
@@ -242,12 +246,12 @@ const ViewOffers = () => {
 						</div>
 					)}
 
-					{/* Chatbot icon at right bottom */}
+					{/* Chatbot icon at right bottom
 					<img
 						src={chatbot}
 						alt="Chatbot Logo"
 						className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
-					/>
+					/> */}
 					{/* Popup Window */}
 					<OfferDetaiPopup
 						isOpen={popupOpen}

@@ -96,7 +96,8 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave, isLoading 
               value={formData.name}
               onChange={handleInputChange}
               disabled={isLoading}
-              className="border rounded px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="border rounded px-2 py-1 w-48 bg-gray-100 disabled:opacity-50"
+              readOnly
             />
           </div>
           
@@ -169,7 +170,6 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave, isLoading 
             >
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
-              <option value="Coming Soon">Coming Soon</option>
             </select>
           </div>
 
@@ -263,7 +263,7 @@ const UpdatePackageDetails = ({ isOpen, onClose, packageData, onSave, isLoading 
                 Updating...
               </div>
             ) : (
-              'Save Changes'
+              'Save'
             )}
           </button>
         </div>

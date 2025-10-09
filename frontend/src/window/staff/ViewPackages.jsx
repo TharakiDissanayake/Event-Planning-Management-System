@@ -73,20 +73,40 @@ const ViewPackages = () => {
 	};
 
 	// Map package data for popup (adjust as needed)
-	const getPopupData = (pkg) => ({
-		id: pkg.packageId || pkg.id,
-		name: pkg.packageName,
-		category: pkg.packageCategory || "Event Package",
-		price: pkg.packagePrice || "",
-		hall: pkg.hall || "",
-		capacity: pkg.capacity || "",
-		includes: pkg.includes || "",
-		status: pkg.packageStatus ? "Active" : "Inactive",
-		description: pkg.includes || "",
-		eventCategories: pkg.eventCategories || [],
-		image: pkg.packageImage ? `http://localhost:8082${pkg.packageImage}` : null,
-		// Add more fields if needed
-	});
+	const getPopupData = (pkg) => {
+		// Handle image URL consistently, similar to how PackageCard does it
+		let imageUrl = null;
+		if (pkg.packageImage) {
+			if (pkg.packageImage.startsWith('http')) {
+				// If it already has a full URL, use it as is
+				imageUrl = pkg.packageImage;
+			} else if (pkg.packageImage.startsWith('/uploads/')) {
+				// If it starts with /uploads/, add the base URL
+				imageUrl = `http://localhost:8082${pkg.packageImage}`;
+			} else if (pkg.packageImage.startsWith('/')) {
+				// If it starts with any other slash, assume it's a path
+				imageUrl = `http://localhost:8082${pkg.packageImage}`;
+			} else {
+				// Otherwise assume it's just a filename
+				imageUrl = `http://localhost:8082/uploads/${pkg.packageImage}`;
+			}
+		}
+		
+		return {
+			id: pkg.packageId || pkg.id,
+			name: pkg.packageName,
+			category: pkg.packageCategory || "Event Package",
+			price: pkg.packagePrice || "",
+			hall: pkg.hall || "",
+			capacity: pkg.capacity || "",
+			includes: pkg.includes || "",
+			status: pkg.packageStatus ? "Active" : "Inactive",
+			description: pkg.includes || "",
+			eventCategories: pkg.eventCategories || [],
+			image: imageUrl,
+			// Add more fields if needed
+		};
+	};
 
 	// Refresh packages after update
 	const handlePackageUpdate = () => {
@@ -206,12 +226,12 @@ const ViewPackages = () => {
 							</CardContainer>
 						)}
 					</div>
-					{/* Chatbot icon at right bottom */}
+					{/* Chatbot icon at right bottom
 					<img
 						src={chatbot}
 						alt="Chatbot Logo"
 						className="fixed bottom-1 right-10 w-15 h-15 z-30 cursor-pointer"
-					/>
+					/> */}
 					{/* Popup Window */}
 					<PackageDetailsPopupWindow
 						isOpen={popupOpen}

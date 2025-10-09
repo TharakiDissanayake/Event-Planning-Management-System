@@ -138,9 +138,43 @@ export const eventService = {
   // Update event
   updateEvent: async (eventId, eventData) => {
     try {
-      const response = await eventApi.put(`/event/update-event?id=${eventId}`, eventData);
+      console.log(`Updating event with ID: ${eventId}`, eventData);
+      
+      // Get the token explicitly
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('Authentication token is missing. Please log in again.');
+      }
+      
+      console.log('Using authentication token:', token.substring(0, 15) + '...');
+      
+      // Use direct API call with explicit token
+      const response = await axios({
+        method: 'PUT',
+        url: `${API_BASE_URL}/event/update-event?id=${eventId}`,
+        data: eventData,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Event update response:', response);
       return response.data;
     } catch (error) {
+      console.error('Error updating event:', error);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
+      
+      // Check if it's an authentication error
+      if (error.response?.status === 401) {
+        console.error('Authentication error (401) while updating event');
+        dispatchTokenExpired();
+        throw new Error('Your session has expired. Please log in again.');
+      }
+      
       throw error.response?.data || error.message;
     }
   },

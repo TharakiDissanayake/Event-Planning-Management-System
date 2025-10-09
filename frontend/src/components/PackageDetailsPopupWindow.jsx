@@ -73,7 +73,7 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
       }
 
       // Update package
-      await packageService.updatePackage(packageId, updatePayload);
+      const updatedPackage = await packageService.updatePackage(packageId, updatePayload);
       
       Swal.fire({
         icon: 'success',
@@ -82,6 +82,9 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
         confirmButtonColor: '#6d28d9',
       });
       setIsEditMode(false);
+      
+      // Log the updated package data
+      console.log('Updated package data received from API:', updatedPackage);
       
       // Refresh data if callback provided
       if (onUpdate) {
@@ -247,9 +250,15 @@ const PackageDetailsPopupWindow = ({ isOpen, onClose, packageData, role, onUpdat
                 alt="Package"
                 className="w-32 h-24 object-cover rounded border"
                 onError={(e) => {
-                  console.log('Package popup image failed to load:', packageData.image);
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'block';
+                  console.log('Package popup image failed to load, trying with full URL:', packageData.image);
+                  // Try to load with full URL if the image failed to load
+                  if (!packageData.image.startsWith('http')) {
+                    e.target.src = `http://localhost:8082${packageData.image}`;
+                  } else {
+                    // If that also fails, show the fallback text
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }
                 }}
               />
             ) : (

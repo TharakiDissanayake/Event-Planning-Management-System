@@ -61,7 +61,7 @@ function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 flex flex-col gap-3">
+      <nav className="flex-1 flex flex-col gap-2.5">
         {filteredLinks.map((link) => (
           <NavLink
             key={link.to}

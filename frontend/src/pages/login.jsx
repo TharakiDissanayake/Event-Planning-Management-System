@@ -109,11 +109,11 @@ function Login() {
                     </button>
                 </div>
                 
-                <div className="mt-4 text-center text-sm text-gray-600">
+                {/* <div className="mt-4 text-center text-sm text-gray-600">
                     <p>Default credentials:</p>
                     <p>Admin: admin@epms.com / admin123</p>
                     <p>Staff: staff@epms.com / staff123</p>
-                </div>
+                </div> */}
             </form>
         </div>
     );
